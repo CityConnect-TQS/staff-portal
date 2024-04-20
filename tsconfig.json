@@ -21,6 +21,6 @@
     "noFallthroughCasesInSwitch": true,
     "noImplicitAny": true
   },
-  "include": ["src"],
+  "include": ["src", "tailwind.config.ts"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }
