@@ -1,15 +1,17 @@
 import {Navbar, NavbarBrand, NavbarContent, NavbarItem, NavbarMenuToggle, NavbarMenu, NavbarMenuItem, Link, Button} from "@nextui-org/react";
 import {useState} from "react";
 import { ThemeSwitcher } from "./themeSwitcher";
+import { useMatchRoute } from '@tanstack/react-router';
 
 export function NavbarStaff() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-
+  const matchRoute = useMatchRoute()
+  
   const menuItems = [
-    {name: "Dashboard", link: "/", isActive: true},
-    {name: "Profile", link: "/about", isActive: false},
-    {name: "Trips", link: "/services", isActive: false},
-  ];
+    {name: "Dashboard", link: "/", isActive: matchRoute({ to: "/" }) !== false},
+    {name: "Trips", link: "/trips", isActive: matchRoute({ to: "/trips" }) !== false},
+ ];
+
 
   return (
     <Navbar onMenuOpenChange={setIsMenuOpen}>
@@ -26,7 +28,7 @@ export function NavbarStaff() {
 
       <NavbarContent className="hidden sm:flex gap-4" justify="center">
         {menuItems.map((item, index) => (
-          <NavbarItem key={`${item}-${index}`}>
+          <NavbarItem key={`${item.name}-${index}`}>
             <Link
               color={
                 item.isActive ? "primary" : "foreground"
@@ -40,19 +42,19 @@ export function NavbarStaff() {
         ))}
       </NavbarContent>
       <NavbarContent justify="end">
-        <NavbarItem className="hidden lg:flex">
-          <Link href="#">Login</Link>
+      <ThemeSwitcher />
+        <NavbarItem className="hidden lg:flex ">
+          <Link href="#" className="text-primary">Login</Link>
         </NavbarItem>
         <NavbarItem>
-          <Button as={Link} color="primary" href="#" variant="flat">
+          <Button as={Link} href="#" variant="flat">
             Sign Up
           </Button>
         </NavbarItem>
-        <ThemeSwitcher />
       </NavbarContent>
       <NavbarMenu>
         {menuItems.map((item, index) => (
-          <NavbarMenuItem key={`${item}-${index}`}>
+          <NavbarMenuItem key={`${item.name}-${index}`}>
             <Link
               color={
                 item.isActive ? "primary" : "foreground"
