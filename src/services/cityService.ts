@@ -1,10 +1,10 @@
 import { City, CityCreate } from "@/types/city";
-import { BASE_API_URL } from "./config";
+import { BACKOFFICE_BASE_API_URL } from "./config";
 
 
 
 export const createCity = async (city: CityCreate): Promise<City> =>
- fetch(BASE_API_URL + "city", {
+ fetch(BACKOFFICE_BASE_API_URL + "city", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -14,7 +14,7 @@ export const createCity = async (city: CityCreate): Promise<City> =>
 
  export const getCities = async (name?: string): Promise<City[]> => {
     return fetch(
-        BASE_API_URL +
+        BACKOFFICE_BASE_API_URL +
         "city" +
         (typeof name !== "undefined" ? "?name=" + name : ""),
         {
@@ -26,14 +26,14 @@ export const createCity = async (city: CityCreate): Promise<City> =>
 };
 
 export const getCity = async (id: number): Promise<City> =>
-  fetch(BASE_API_URL + "city/" + id, {
+  fetch(BACKOFFICE_BASE_API_URL + "city/" + id, {
     headers: {
       "Content-Type": "application/json",
     },
   }).then((res) => res.json() as Promise<City>);
 
 export const updateCity = async (id: number, city: CityCreate): Promise<City> =>
-  fetch(BASE_API_URL + "city/" + id, {
+  fetch(BACKOFFICE_BASE_API_URL + "city/" + id, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
@@ -42,7 +42,7 @@ export const updateCity = async (id: number, city: CityCreate): Promise<City> =>
   }).then((res) => res.json() as Promise<City>);
 
 export const deleteCity = async (id: number): Promise<undefined> =>
-  fetch(BASE_API_URL + "city/" + id, {
+  fetch(BACKOFFICE_BASE_API_URL + "city/" + id, {
     method: "DELETE",
     headers: {
       "Content-Type": "application/json",

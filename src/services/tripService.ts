@@ -1,10 +1,10 @@
 import { Trip, TripCreate, TripSearchParameters } from "@/types/trip";
-import { BASE_API_URL } from "./config";
+import { BACKOFFICE_BASE_API_URL, PUBLIC_BASE_API_URL } from "./config";
 import { CurrencyParams } from "@/types/currency";
 import { Reservation } from "@/types/reservation";
 
 export const createTrip = async (trip: TripCreate): Promise<Trip> =>
-  fetch(BASE_API_URL + "trip", {
+  fetch(BACKOFFICE_BASE_API_URL + "trip", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -16,7 +16,7 @@ export const getTrips = async (
   params?: TripSearchParameters
 ): Promise<Trip[]> => {
   const res = await fetch(
-    BASE_API_URL +
+    PUBLIC_BASE_API_URL +
       "trip?" +
       new URLSearchParams(params as Record<string, string>).toString(),
     {
@@ -38,7 +38,7 @@ export const getTrip = async (
   params?: CurrencyParams
 ): Promise<Trip> => {
   const res = await fetch(
-    BASE_API_URL +
+    PUBLIC_BASE_API_URL +
       "trip/" +
       id +
       "?" +
@@ -60,7 +60,7 @@ export const getTripReservations = async (
   params?: CurrencyParams
 ): Promise<Reservation[]> =>
   fetch(
-    BASE_API_URL +
+    BACKOFFICE_BASE_API_URL +
       "trip/" +
       id +
       "/reservations?" +
@@ -73,7 +73,7 @@ export const getTripReservations = async (
   ).then((res) => res.json() as Promise<Reservation[]>);
 
 export const updateTrip = async (id: number, trip: TripCreate): Promise<Trip> =>
-  fetch(BASE_API_URL + "trip/" + id, {
+  fetch(BACKOFFICE_BASE_API_URL + "trip/" + id, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
@@ -82,7 +82,7 @@ export const updateTrip = async (id: number, trip: TripCreate): Promise<Trip> =>
   }).then((res) => res.json() as Promise<Trip>);
 
 export const deleteTrip = async (id: number): Promise<undefined> =>
-  fetch(BASE_API_URL + "trip/" + id, {
+  fetch(BACKOFFICE_BASE_API_URL + "trip/" + id, {
     method: "DELETE",
     headers: {
       "Content-Type": "application/json",
