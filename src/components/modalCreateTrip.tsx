@@ -1,7 +1,8 @@
 import {Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, useDisclosure, Input, Autocomplete, AutocompleteItem, DatePicker} from "@nextui-org/react";
 import { useForm } from '@tanstack/react-form'
-import { ZonedDateTime } from '@internationalized/date';
+import { ZonedDateTime, now, getLocalTimeZone } from '@internationalized/date';
 import { TripCreate } from "@/types/trip";
+import { createTrip } from "@/services/tripService";
 
 export function ModalCreateTrip() {
   const {isOpen, onOpen, onClose} = useDisclosure();
@@ -31,16 +32,37 @@ export function ModalCreateTrip() {
 
    
   const { Field, handleSubmit, state } = useForm<TripCreate>({
+    defaultValues: {
+      departure: {id: 0},
+      departureTime: now(getLocalTimeZone()).toDate(),
+      arrivalTime: now(getLocalTimeZone()).toDate(),
+      arrival: {id: 0},
+      price: 0.00,
+      bus: {id: 0},
+    },
    onSubmit: async ({ value }) => {
-     console.log(value);
-     console.log(state);
-     if (value.departure.id === 0 || value.arrival.id === 0 || value.bus.id === 0 || value.price === 0
-       || value.arrival === value.departure || value.departureTime >=  value.arrivalTime){
+    console.log(value);
+    const trip = await createTrip(value).catch((error) => {
+       console.error('Error:', error);
        return;
-     }
-     console.log(value);
-     console.log(state);
-     await Promise.resolve();
+     });
+
+    console.log(trip);
+
+    onClose();
+  },
+  validators: {
+    onSubmit: (value) => {
+      if (value.value.departureTime >= value.value.arrivalTime) {
+        return 'The departure date and time must be less than the arrival date and time.';
+      }
+      if (value.value.departure.id === value.value.arrival.id) {
+        return 'The departure city must be different from the arrival city.';
+      }
+      if (value.value.departureTime.toString() === value.value.arrivalTime.toString()) {
+        return 'The departure date and time must be different from the arrival date and time.';
+      }
+    },
   },
   });
 
@@ -60,14 +82,18 @@ export function ModalCreateTrip() {
               <form className="flex flex-col gap-4">
                 <Field
                   name="departure"
-                  >
+                  validators={{
+                    onChange: (value) => value.value === undefined || value.value.id < 1 ? 'Please select a departure city from the list.' : undefined,
+                  }}
+                >
                   {({ state, handleChange, handleBlur }) => (
+                    <>
                       <Autocomplete
                         id="filled-basic"
                         isRequired
                         label="Departure City"
                         defaultItems={citys}
-                        defaultInputValue= {state.value? citys.find(city => city.id == state.value?.id)?.name : "From"}
+                        defaultInputValue= {state.value? citys.find(city => city.id == state.value?.id)?.name : ""}
                         onSelectionChange={(selectedValue) => {
                           const selectedCity = citys.find(city => city.id == selectedValue);
                           if (selectedCity) {
@@ -81,18 +107,21 @@ export function ModalCreateTrip() {
                       >
                         {(item) => <AutocompleteItem key={item.id} textValue={item.name}>{item.name}</AutocompleteItem>}
                       </Autocomplete>
+                      {state.meta.errors && <span className="text-red-500">{state.meta.errors}</span>}
+                    </>
                   )}
                 </Field>
                 <Field
                   name="departureTime"
                   >
                   {({ state, handleChange, handleBlur }) => (
+                    <>
                     <DatePicker
                       label="Departure Date and Time"
                       variant="underlined"
                       hideTimeZone
                       showMonthAndYearPickers
-                      defaultValue={state.value? new ZonedDateTime(
+                      defaultValue={new ZonedDateTime(
                         'era',
                         state.value?.getUTCFullYear(),
                         state.value?.getUTCMonth(),
@@ -102,24 +131,29 @@ export function ModalCreateTrip() {
                         state.value?.getUTCHours(),
                         state.value?.getUTCMinutes(),
                         state.value?.getUTCSeconds()
-                      ) : new ZonedDateTime( 'era', 2021, 1, 1, 'Europe/Lisbon', -1, 0, 0, 0)}
+                      )}
                       onChange={(value: ZonedDateTime) => {
                         handleChange(value.toDate());
                       }}
                       onBlur={handleBlur}
-                      calendarProps={{className: "bg-transparent"}}
                     />
+                    {state.meta.errors && <span className="text-red-500">{state.meta.errors}</span>}
+                    </>
                   )}
                 </Field>
                 <Field
                   name="arrival"
-                  >
+                  validators={{
+                    onChange: (value) => value.value === undefined || value.value.id < 1 ? 'Please select a arrival city from the list.' : undefined,
+                  }}
+                >
                   {({ state, handleChange, handleBlur }) => (
+                    <>
                     <Autocomplete
                       isRequired
                       label="Arrival City"
                       defaultItems={citys}
-                      defaultInputValue= {state.value? citys.find(city => city.id == state.value?.id)?.name : "To"}
+                      defaultInputValue= {citys.find(city => city.id == state.value?.id)?.name}
                       onSelectionChange={(selectedValue) => {
                         const selectedCity = citys.find(city => city.id == selectedValue);
                         if (selectedCity) {
@@ -133,18 +167,21 @@ export function ModalCreateTrip() {
                     >
                       {(item) => <AutocompleteItem key={item.id} textValue={item.name}>{item.name}</AutocompleteItem>}
                     </Autocomplete>
+                    {state.meta.errors && <span className="text-red-500">{state.meta.errors}</span>}
+                    </>
                   )}
                 </Field>
                 <Field
                   name="arrivalTime"
                   >
                   {({ state, handleChange, handleBlur }) => (
+                    <>
                     <DatePicker
                     label="Arrival Date and Time"
                     variant="underlined"
                     hideTimeZone
                     showMonthAndYearPickers
-                    defaultValue={state.value? new ZonedDateTime(
+                    defaultValue={new ZonedDateTime(
                       'era',
                       state.value?.getUTCFullYear(),
                       state.value?.getUTCMonth(),
@@ -154,19 +191,25 @@ export function ModalCreateTrip() {
                       state.value?.getUTCHours(),
                       state.value?.getUTCMinutes(),
                       state.value?.getUTCSeconds()
-                    ) : new ZonedDateTime( 'era', 2021, 1, 1, 'Europe/Lisbon', -1, 0, 0, 0)}
+                    )}
                     onChange={(value: ZonedDateTime) => {
                       handleChange(value.toDate());
                     }}
                     onBlur={handleBlur}
                     calendarProps={{className: "bg-transparent"}}
                     />
+                    {state.meta.errors && <span className="text-red-500">{state.meta.errors}</span>}
+                    </>
                   )}
                 </Field>
                 <Field
                   name="price"
+                  validators={{
+                    onChange: (value) => value.value < 1 || value.value === undefined ? 'The price value must be greater than 0.' : undefined,
+                  }}
                   >
                   {({ state, handleChange, handleBlur }) => (
+                    <>
                     <Input
                       type="number"
                       label="Price"
@@ -183,22 +226,26 @@ export function ModalCreateTrip() {
                       onBlur={handleBlur}
                       variant="underlined"
                     />
+                    {state.meta.errors && <span className="text-red-500">{state.meta.errors}</span>}
+                    </>
                   )}
                 </Field>
                 <Field
                   name="bus"
+                  validators={{
+                    onSubmit: (value) => value.value === undefined || value.value.id < 1 ? 'Please select a bus from the list.' : undefined,
+                  }}
                   >
                   {({ state, handleChange, handleBlur }) => (
+                    <>
                     <Autocomplete
                     isRequired
                     label="Bus"
                     defaultItems={buses}
-                    defaultInputValue= {state.value? buses.find(bus => bus.id == state.value?.id)?.id + " (" + buses.find(bus => bus.id == state.value?.id)?.company + " - " + buses.find(bus => bus.id == state.value?.id)?.capacity + " seats)" : ""}
+                    defaultInputValue= {state.value && buses.find(bus => bus.id == state.value.id) !== undefined ?  buses.find(bus => bus.id == state.value.id)?.id + " (" + buses.find(bus => bus.id == state.value.id)?.company + " - " + buses.find(bus => bus.id == state.value.id)?.capacity + " seats)" : ""}
                     onSelectionChange={(selectedValue) => {
                       const selectedBus = buses.find(bus => bus.id == selectedValue);
                       if (selectedBus) {
-                        console.log("changed bus");
-                        console.log(selectedBus);
                         handleChange({id: selectedBus.id});
                       }
                     }}
@@ -209,8 +256,11 @@ export function ModalCreateTrip() {
                   >
                     {(item) => <AutocompleteItem key={item.id} textValue={`${item.id} (${item.company} - ${item.capacity} seats)`}>{item.id} ({item.company} - {item.capacity} seats) </AutocompleteItem>}
                   </Autocomplete>
+                  {state.meta.errors && <span className="text-red-500">{state.meta.errors}</span>}
+                  </>
                   )}
                 </Field>
+                {state.errors && <span className="text-red-500">{state.errors}</span>}
                 </form>
               </ModalBody>
               <ModalFooter>

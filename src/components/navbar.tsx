@@ -21,7 +21,7 @@ export function NavbarStaff() {
           className="sm:hidden"
         />
         <NavbarBrand>
-          <img src="/public/logo.jpeg" alt="CityConnect" className="h-8 mr-4 w-auto rounded" />
+          <img src="/logo.jpeg" alt="CityConnect" className="h-8 mr-4 w-auto rounded" />
           <p className="font-bold text-inherit">CityConnect</p>
         </NavbarBrand>
       </NavbarContent>
