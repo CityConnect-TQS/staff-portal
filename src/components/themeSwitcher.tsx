@@ -3,8 +3,6 @@
 
 import {useTheme} from "next-themes";
 import { useEffect, useState } from "react";
-import {MoonIcon} from "./moonIcon";
-import {SunIcon} from "./sunIcon";
 import {Button} from "@nextui-org/react";
 import { MaterialSymbol } from "react-material-symbols";
 
@@ -32,11 +30,11 @@ export function ThemeSwitcher() {
     <div>
       <Button isIconOnly variant="ghost" className="border-none" onClick={switchTheme}>
         {theme === 'light'? (
-          <SunIcon />
+          <MaterialSymbol  icon="light_mode" size={20} />
         ) : theme === 'dark'? (
-          <MoonIcon />
+          <MaterialSymbol  icon="dark_mode" size={20} />
         ) : (
-          <MaterialSymbol  icon="computer" size={16} /> 
+          <MaterialSymbol  icon="night_sight_auto" size={20} /> 
         )}
       </Button>
     </div>
