@@ -1,6 +1,6 @@
 import {Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, useDisclosure, Input, Autocomplete, AutocompleteItem, DatePicker} from "@nextui-org/react";
 import { useForm } from '@tanstack/react-form'
-import { ZonedDateTime, now, getLocalTimeZone, toLocalTimeZone } from '@internationalized/date';
+import { ZonedDateTime, now, getLocalTimeZone } from '@internationalized/date';
 import { TripCreate } from "@/types/trip";
 import { createTrip } from "@/services/tripService";
 import { getBuses } from "@/services/busService";
@@ -104,7 +104,6 @@ export function ModalCreateTrip() {
                   }}
                 >
                   {({ state, handleChange, handleBlur }) => (
-                    <>
                       <Autocomplete
                         id="filled-basic"
                         isRequired
@@ -121,18 +120,17 @@ export function ModalCreateTrip() {
                         placeholder="Select departure city"
                         className="w-full"
                         variant="underlined"
+                        isInvalid={state.meta.errors.length > 0}
+                        errorMessage={state.meta.errors}
                       >
                         {(item) => <AutocompleteItem key={item.id} textValue={item.name}>{item.name}</AutocompleteItem>}
                       </Autocomplete>
-                      {state.meta.errors && <span className="text-red-500">{state.meta.errors}</span>}
-                    </>
                   )}
                 </Field>
                 <Field
                   name="departureTime"
                   >
                   {({ state, handleChange, handleBlur }) => (
-                    <>
                     <DatePicker
                       label="Departure Date and Time"
                       variant="underlined"
@@ -154,9 +152,9 @@ export function ModalCreateTrip() {
                         handleChange(value.toDate());
                       }}
                       onBlur={handleBlur}
+                      isInvalid={state.meta.errors.length > 0}
+                      errorMessage={state.meta.errors}
                     />
-                    {state.meta.errors && <span className="text-red-500">{state.meta.errors}</span>}
-                    </>
                   )}
                 </Field>
                 <Field
@@ -166,7 +164,6 @@ export function ModalCreateTrip() {
                   }}
                 >
                   {({ state, handleChange, handleBlur }) => (
-                    <>
                     <Autocomplete
                       isRequired
                       label="Arrival City"
@@ -182,18 +179,17 @@ export function ModalCreateTrip() {
                       placeholder="Select Arrival city"
                       className="w-full"
                       variant="underlined"
+                      isInvalid={state.meta.errors.length > 0}
+                      errorMessage={state.meta.errors}
                     >
                       {(item) => <AutocompleteItem key={item.id} textValue={item.name}>{item.name}</AutocompleteItem>}
                     </Autocomplete>
-                    {state.meta.errors && <span className="text-red-500">{state.meta.errors}</span>}
-                    </>
                   )}
                 </Field>
                 <Field
                   name="arrivalTime"
                   >
                   {({ state, handleChange, handleBlur }) => (
-                    <>
                     <DatePicker
                     label="Arrival Date and Time"
                     variant="underlined"
@@ -216,9 +212,9 @@ export function ModalCreateTrip() {
                     }}
                     onBlur={handleBlur}
                     calendarProps={{className: "bg-transparent"}}
+                    isInvalid={state.meta.errors.length > 0}
+                    errorMessage={state.meta.errors}
                     />
-                    {state.meta.errors && <span className="text-red-500">{state.meta.errors}</span>}
-                    </>
                   )}
                 </Field>
                 <Field
@@ -228,7 +224,6 @@ export function ModalCreateTrip() {
                   }}
                   >
                   {({ state, handleChange, handleBlur }) => (
-                    <>
                     <Input
                       type="number"
                       label="Price"
@@ -244,9 +239,9 @@ export function ModalCreateTrip() {
                       onChange={(e) => handleChange(Number.parseInt(e.target.value))}
                       onBlur={handleBlur}
                       variant="underlined"
+                      isInvalid={state.meta.errors.length > 0}
+                      errorMessage={state.meta.errors}
                     />
-                    {state.meta.errors && <span className="text-red-500">{state.meta.errors}</span>}
-                    </>
                   )}
                 </Field>
                 <Field
@@ -256,7 +251,6 @@ export function ModalCreateTrip() {
                   }}
                   >
                   {({ state, handleChange, handleBlur }) => (
-                    <>
                     <Autocomplete
                     isRequired
                     label="Bus"
@@ -272,11 +266,11 @@ export function ModalCreateTrip() {
                     placeholder="Select the bus"
                     className="w-full"
                     variant="underlined"
+                    isInvalid={state.meta.errors.length > 0}
+                    errorMessage={state.meta.errors}
                   >
                     {(item) => <AutocompleteItem key={item.id} textValue={`${item.id} (${item.company} - ${item.capacity} seats)`}>{item.id} ({item.company} - {item.capacity} seats) </AutocompleteItem>}
                   </Autocomplete>
-                  {state.meta.errors && <span className="text-red-500">{state.meta.errors}</span>}
-                  </>
                   )}
                 </Field>
                 {state.errors && <span className="text-red-500">{state.errors}</span>}
