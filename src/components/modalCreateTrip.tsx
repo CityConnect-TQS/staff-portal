@@ -1,36 +1,28 @@
 import {Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, useDisclosure, Input, Autocomplete, AutocompleteItem, DatePicker} from "@nextui-org/react";
 import { useForm } from '@tanstack/react-form'
-import { ZonedDateTime, now, getLocalTimeZone } from '@internationalized/date';
+import { ZonedDateTime, now, getLocalTimeZone, toLocalTimeZone } from '@internationalized/date';
 import { TripCreate } from "@/types/trip";
 import { createTrip } from "@/services/tripService";
+import { getBuses } from "@/services/busService";
+import { useQuery } from "@tanstack/react-query";
+import { getCities } from "@/services/cityService";
+import { City } from "@/types/city";
+import { Bus } from "@/types/bus";
 
 export function ModalCreateTrip() {
   const {isOpen, onOpen, onClose} = useDisclosure();
 
-  const citys = [
-    {id: 1, name: 'Aveiro'},
-    {id: 2, name: 'Beja'},
-    {id: 3, name: 'Braga'},
-    {id: 4, name: 'Bragança'},
-    {id: 5, name: 'Castelo Branco'},
-    {id: 6, name: 'Coimbra'},
-    {id: 7, name: 'Évora'},
-    {id: 8, name: 'Faro'},
-    {id: 9, name: 'Guarda'}
-  ];
+  const { data: cities } = useQuery<City[], Error>({
+    queryKey: ['cities'], 
+    queryFn: () => getCities().then((data) => data.map((city) => ({id: city.id, name: city.name}))),
+   });
+  
+  const { data: buses } = useQuery<Bus[], Error>({
+    queryKey: ['buses'], 
+    queryFn: () => getBuses().then((data) => data.map((bus) => ({id: bus.id, company: bus.company, capacity: bus.capacity}))),
+   });
 
-  const buses = [
-    {id: 1, capacity: 10, company: 'Renex'},
-    {id: 2, capacity: 20, company: 'FlixBus'},
-    {id: 3, capacity: 30, company: 'Rede Expresso'},
-    {id: 4, capacity: 40, company: 'Citi Express'},
-    {id: 5, capacity: 50, company: 'FlixBus'},
-    {id: 6, capacity: 60, company: 'Renex'},
-    {id: 7, capacity: 70, company: 'Rede Expresso'},
-    {id: 8, capacity: 80, company: 'Citi Express'},
-  ];
 
-   
   const { Field, handleSubmit, state } = useForm<TripCreate>({
     defaultValues: {
       departure: {id: 0},
@@ -42,12 +34,37 @@ export function ModalCreateTrip() {
     },
    onSubmit: async ({ value }) => {
     console.log(value);
-    const trip = await createTrip(value).catch((error) => {
+
+    const departureCity = cities?.find(city => city.id == value.departure.id)? cities?.find(city => city.id == value.departure.id) : "";
+    const arrivalCity = cities?.find(city => city.id == value.arrival.id)? cities?.find(city => city.id == value.arrival.id) : "";
+    const bus = buses?.find(bus => bus.id == value.bus.id)? buses?.find(bus => bus.id == value.bus.id) : "";
+    const departureTime = value.departureTime instanceof Date ? value.departureTime.toISOString().slice(0, 19) : "";
+    const arrivalTime = value.arrivalTime instanceof Date ? value.arrivalTime.toISOString().slice(0, 19) : "";
+
+    if (!departureCity || !arrivalCity || !bus || !departureTime || !arrivalTime) {
+      return;
+    }
+    console.log(arrivalTime);
+    console.log(departureTime);
+    const trip: TripCreate = {
+      departure: departureCity,
+      departureTime: departureTime,
+      arrival: arrivalCity,
+      arrivalTime: arrivalTime,
+      price: value.price,
+      bus: bus,
+    };
+
+    const tripCreated = await createTrip(trip).catch((error) => {
        console.error('Error:', error);
        return;
      });
 
-    console.log(trip);
+    if (!tripCreated) {
+      return;
+    }
+
+    console.log(tripCreated);
 
     onClose();
   },
@@ -92,10 +109,10 @@ export function ModalCreateTrip() {
                         id="filled-basic"
                         isRequired
                         label="Departure City"
-                        defaultItems={citys}
-                        defaultInputValue= {state.value? citys.find(city => city.id == state.value?.id)?.name : ""}
+                        defaultItems={cities}
+                        defaultInputValue= {state.value? cities?.find(city => city.id == state.value?.id)?.name : ""}
                         onSelectionChange={(selectedValue) => {
-                          const selectedCity = citys.find(city => city.id == selectedValue);
+                          const selectedCity = cities?.find(city => city.id == selectedValue);
                           if (selectedCity) {
                             handleChange({id: selectedCity.id});
                           }
@@ -121,16 +138,17 @@ export function ModalCreateTrip() {
                       variant="underlined"
                       hideTimeZone
                       showMonthAndYearPickers
+                      isRequired
                       defaultValue={new ZonedDateTime(
                         'era',
-                        state.value?.getUTCFullYear(),
-                        state.value?.getUTCMonth(),
-                        state.value?.getUTCDay(),
+                        state.value instanceof Date ? state.value.getUTCFullYear() : 0,
+                        state.value instanceof Date ? state.value.getUTCMonth() : 0,
+                        state.value instanceof Date ? state.value.getUTCDay() : 0,
                         'Europe/Lisbon',
                         -1, 
-                        state.value?.getUTCHours(),
-                        state.value?.getUTCMinutes(),
-                        state.value?.getUTCSeconds()
+                        state.value instanceof Date ? state.value.getUTCHours() : 0,
+                        state.value instanceof Date ? state.value.getUTCMinutes() : 0,
+                        state.value instanceof Date ? state.value.getUTCSeconds() : 0
                       )}
                       onChange={(value: ZonedDateTime) => {
                         handleChange(value.toDate());
@@ -152,10 +170,10 @@ export function ModalCreateTrip() {
                     <Autocomplete
                       isRequired
                       label="Arrival City"
-                      defaultItems={citys}
-                      defaultInputValue= {citys.find(city => city.id == state.value?.id)?.name}
+                      defaultItems={cities}
+                      defaultInputValue= {cities?.find(city => city.id == state.value?.id)?.name}
                       onSelectionChange={(selectedValue) => {
-                        const selectedCity = citys.find(city => city.id == selectedValue);
+                        const selectedCity = cities?.find(city => city.id == selectedValue);
                         if (selectedCity) {
                           handleChange({id: selectedCity.id});
                         }
@@ -181,16 +199,17 @@ export function ModalCreateTrip() {
                     variant="underlined"
                     hideTimeZone
                     showMonthAndYearPickers
+                    isRequired
                     defaultValue={new ZonedDateTime(
                       'era',
-                      state.value?.getUTCFullYear(),
-                      state.value?.getUTCMonth(),
-                      state.value?.getUTCDay(),
+                      state.value instanceof Date ? state.value.getUTCFullYear() : 0,
+                      state.value instanceof Date ? state.value.getUTCMonth() : 0,
+                      state.value instanceof Date ? state.value.getUTCDay() : 0,
                       'Europe/Lisbon',
                       -1, 
-                      state.value?.getUTCHours(),
-                      state.value?.getUTCMinutes(),
-                      state.value?.getUTCSeconds()
+                      state.value instanceof Date ? state.value.getUTCHours() : 0,
+                      state.value instanceof Date ? state.value.getUTCMinutes() : 0,
+                      state.value instanceof Date ? state.value.getUTCSeconds() : 0
                     )}
                     onChange={(value: ZonedDateTime) => {
                       handleChange(value.toDate());
@@ -242,9 +261,9 @@ export function ModalCreateTrip() {
                     isRequired
                     label="Bus"
                     defaultItems={buses}
-                    defaultInputValue= {state.value && buses.find(bus => bus.id == state.value.id) !== undefined ?  buses.find(bus => bus.id == state.value.id)?.id + " (" + buses.find(bus => bus.id == state.value.id)?.company + " - " + buses.find(bus => bus.id == state.value.id)?.capacity + " seats)" : ""}
+                    defaultInputValue= {state.value && buses?.find(bus => bus.id == state.value.id) !== undefined ?  buses.find(bus => bus.id == state.value.id)?.id + " (" + buses.find(bus => bus.id == state.value.id)?.company + " - " + buses.find(bus => bus.id == state.value.id)?.capacity + " seats)" : ""}
                     onSelectionChange={(selectedValue) => {
-                      const selectedBus = buses.find(bus => bus.id == selectedValue);
+                      const selectedBus = buses?.find(bus => bus.id == selectedValue);
                       if (selectedBus) {
                         handleChange({id: selectedBus.id});
                       }

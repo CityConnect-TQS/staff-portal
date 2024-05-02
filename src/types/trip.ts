@@ -17,8 +17,8 @@ export type TripCreate = Omit<Trip, "id" | "bus" | "departure" | "arrival" | "de
   bus: BusReference;
   departure: CityReference;
   arrival: CityReference;
-  departureTime: Date;
-  arrivalTime: Date;
+  departureTime: Date | string;
+  arrivalTime: Date | string;
   price: number;
 };
 
