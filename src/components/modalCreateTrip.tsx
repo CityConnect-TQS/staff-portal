@@ -8,6 +8,7 @@ import { useQuery } from "@tanstack/react-query";
 import { getCities } from "@/services/cityService";
 import { City } from "@/types/city";
 import { Bus } from "@/types/bus";
+import { MaterialSymbol } from "react-material-symbols";
 
 export function ModalCreateTrip() {
   const {isOpen, onOpen, onClose} = useDisclosure();
@@ -86,8 +87,8 @@ export function ModalCreateTrip() {
   return (
     <>
       <div className="flex flex-wrap gap-3">
-        <Button color="default" variant="bordered" onClick={onOpen}>
-            Add Trip
+        <Button color="primary" onClick={onOpen} endContent={<MaterialSymbol icon="add" size={20}/>}>
+           Add New
         </Button>
       </div>
       <Modal backdrop={'blur'} isOpen={isOpen} onClose={onClose}>
