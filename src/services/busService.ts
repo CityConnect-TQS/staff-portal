@@ -1,5 +1,5 @@
 import { Bus, BusCreate } from "@/types/bus";
-import { BACKOFFICE_BASE_API_URL } from "./config";
+import { BACKOFFICE_BASE_API_URL, PUBLIC_BASE_API_URL } from "./config";
 
 export const createBus = async (bus: BusCreate): Promise<Bus> =>
   fetch(BACKOFFICE_BASE_API_URL + "bus", {
@@ -11,14 +11,14 @@ export const createBus = async (bus: BusCreate): Promise<Bus> =>
   }).then((res) => res.json() as Promise<Bus>);
 
 export const getBuses = async (): Promise<Bus[]> =>
-  fetch(BACKOFFICE_BASE_API_URL + "bus", {
+  fetch(PUBLIC_BASE_API_URL + "bus", {
     headers: {
       "Content-Type": "application/json",
     },
   }).then((res) => res.json() as Promise<Bus[]>);
 
 export const getBus = async (id: number): Promise<Bus> =>
-  fetch(BACKOFFICE_BASE_API_URL + "bus/" + id, {
+  fetch(PUBLIC_BASE_API_URL + "bus/" + id, {
     headers: {
       "Content-Type": "application/json",
     },

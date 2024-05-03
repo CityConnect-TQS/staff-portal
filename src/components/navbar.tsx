@@ -9,7 +9,7 @@ export function NavbarStaff() {
   
   const menuItems = [
     {name: "Dashboard", link: "/", isActive: matchRoute({ to: "/" }) !== false},
-    {name: "Trips", link: "/trips", isActive: matchRoute({ to: "/trips" }) !== false},
+    {name: "About", link: "/about", isActive: matchRoute({ to: "/about" }) !== false},
  ];
 
 
