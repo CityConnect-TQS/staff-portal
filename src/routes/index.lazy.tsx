@@ -1,4 +1,5 @@
 import { NavbarStaff } from "@/components/navbar";
+import { TripsTable } from "@/components/tripsTable";
 import { createLazyFileRoute } from "@tanstack/react-router";
 
 export const Route = createLazyFileRoute("/")({
@@ -7,9 +8,11 @@ export const Route = createLazyFileRoute("/")({
 
 function Index() {
   return (
-    <div className="p-2">
+    <div className="flex flex-col gap-16 p-2">
       <NavbarStaff />
-      <h3>Welcome Home!</h3>
+      <div className="px-16">
+        <TripsTable />
+      </div>
     </div>
   );
 }

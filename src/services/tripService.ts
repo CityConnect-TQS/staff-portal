@@ -30,6 +30,7 @@ export const getTrips = async (
     trip.departureTime = new Date(trip.departureTime);
     trip.arrivalTime = new Date(trip.arrivalTime);
   });
+
   return data;
 };
 
