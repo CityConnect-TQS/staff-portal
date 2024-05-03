@@ -16,7 +16,7 @@ export const getTrips = async (
   params?: TripSearchParameters
 ): Promise<Trip[]> => {
   const res = await fetch(
-    PUBLIC_BASE_API_URL +
+    BACKOFFICE_BASE_API_URL +
       "trip?" +
       new URLSearchParams(params as Record<string, string>).toString(),
     {

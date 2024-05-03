@@ -4,7 +4,7 @@ import { ZonedDateTime, now, getLocalTimeZone } from '@internationalized/date';
 import { TripCreate } from "@/types/trip";
 import { createTrip } from "@/services/tripService";
 import { getBuses } from "@/services/busService";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { getCities } from "@/services/cityService";
 import { City } from "@/types/city";
 import { Bus } from "@/types/bus";
@@ -23,6 +23,8 @@ export function ModalCreateTrip() {
     queryFn: () => getBuses().then((data) => data.map((bus) => ({id: bus.id, company: bus.company, capacity: bus.capacity}))),
    });
 
+   const queryClient = useQueryClient();
+
 
   const { Field, handleSubmit, state } = useForm<TripCreate>({
     defaultValues: {
@@ -34,7 +36,6 @@ export function ModalCreateTrip() {
       bus: {id: 0},
     },
    onSubmit: async ({ value }) => {
-    console.log(value);
 
     const departureCity = cities?.find(city => city.id == value.departure.id)? cities?.find(city => city.id == value.departure.id) : "";
     const arrivalCity = cities?.find(city => city.id == value.arrival.id)? cities?.find(city => city.id == value.arrival.id) : "";
@@ -45,8 +46,6 @@ export function ModalCreateTrip() {
     if (!departureCity || !arrivalCity || !bus || !departureTime || !arrivalTime) {
       return;
     }
-    console.log(arrivalTime);
-    console.log(departureTime);
     const trip: TripCreate = {
       departure: departureCity,
       departureTime: departureTime,
@@ -65,7 +64,7 @@ export function ModalCreateTrip() {
       return;
     }
 
-    console.log(tripCreated);
+    await queryClient.invalidateQueries({queryKey: ['trips']});
 
     onClose();
   },
