@@ -21,9 +21,9 @@ export function ModalCreateTrip() {
   const { data: buses } = useQuery<Bus[], Error>({
     queryKey: ['buses'], 
     queryFn: () => getBuses().then((data) => data.map((bus) => ({id: bus.id, company: bus.company, capacity: bus.capacity}))),
-   });
+  });
 
-   const queryClient = useQueryClient();
+  const queryClient = useQueryClient();
 
 
   const { Field, handleSubmit, state } = useForm<TripCreate>({
