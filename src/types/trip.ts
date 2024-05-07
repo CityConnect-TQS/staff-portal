@@ -30,3 +30,16 @@ export type TripSearchParameters = CurrencyParams & {
   departureTime?: string;
   seats?: number;
 };
+
+export type TripDataTable = &{
+  id: number;
+  departure: string;
+  arrival: string;
+  departureDate: Date;
+  arrivalDate: Date;
+  price: number;
+  freeSeats: number;
+  bus: string;
+  busCapacity: number;
+  status: string;
+}
