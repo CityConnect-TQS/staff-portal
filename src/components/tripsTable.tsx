@@ -142,7 +142,7 @@ export function TripsTable() {
   const [, setSelectedTrip] = useCookies(["selectedTrip"]);
 
   const handleSelectTripEdit = useCallback((trip: TripDataTable) => () => {
-    const tripData = JSON.stringify({ trip: trip, type: "edit" });
+    const tripData = JSON.stringify({ trip: trip, type: true});
     setSelectedTrip("selectedTrip", tripData);
   }, [setSelectedTrip]);
 
