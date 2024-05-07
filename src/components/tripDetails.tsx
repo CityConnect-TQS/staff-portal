@@ -6,7 +6,7 @@ import { Autocomplete, AutocompleteItem, Button, DatePicker, Input } from "@next
 import { City } from "@/types/city";
 import { Bus } from "@/types/bus";
 import { useQuery } from "@tanstack/react-query";
-import { TripCreate } from "@/types/trip";
+import { SelectedTripCookies, TripCreate } from "@/types/trip";
 import { useState } from "react";
 import { useCookies } from "react-cookie";
 
@@ -27,8 +27,8 @@ export function TripDetailsBoard() {
   });
 
 
-  const [selectedTrip, setSelectedTrip] = useCookies(['selectedTrip']);
-  console.log(selectedTrip);
+  const [cookies] = useCookies(['selectedTrip']);
+  const selectedTrip = cookies.selectedTrip as SelectedTripCookies;
 
   const { Field, handleSubmit, state } = useForm<TripCreate>({
     defaultValues: {
@@ -48,6 +48,7 @@ export function TripDetailsBoard() {
   if (isLoadingCities || isLoadingBuses) {
     return <div>Loading...</div>;
   }
+
 
   return (
     <div className="mx-16">
@@ -81,7 +82,7 @@ export function TripDetailsBoard() {
                       isRequired
                       label="Departure City"
                       defaultItems={cities}
-                      defaultInputValue= {selectedTrip ? selectedTrip.selectedTrip.departure.name : ""}
+                      defaultInputValue= {selectedTrip.trip.departure}
                       onSelectionChange={(selectedValue) => {
                       const selectedcities = cities?.find(cities => cities.id == selectedValue);
                       if (selectedcities) {
@@ -111,7 +112,7 @@ export function TripDetailsBoard() {
                   isRequired
                   label="Arrival cities"
                   defaultItems={cities}
-                  defaultInputValue= {cities?.find(cities => cities.id == state.value?.id)?.name}
+                  defaultInputValue= {selectedTrip.trip.arrival}
                   onSelectionChange={(selectedValue) => {
                     const selectedcities = cities?.find(cities => cities.id == selectedValue);
                     if (selectedcities) {
