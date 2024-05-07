@@ -25,6 +25,8 @@ import { ChangeEvent, Key, useCallback, useMemo, useState } from "react";
 import { MaterialSymbol } from "react-material-symbols";
 import { ModalCreateTrip } from "./modalCreateTrip";
 import { ModalDeleteTrip } from "./modalDeleteTrip";
+import { Link } from "@tanstack/react-router";
+import { useCookies } from "react-cookie";
 
 const statusColorMap: Record<string, ChipProps["color"]> = {
   active: "success",
@@ -137,6 +139,13 @@ export function TripsTable() {
     });
   }, [sortDescriptor, items]);
 
+  const [, setSelectedTrip] = useCookies(["selectedTrip"]);
+
+  const handleSelectTripEdit = useCallback((trip: TripDataTable) => () => {
+    const tripData = JSON.stringify({ trip: trip, type: "edit" });
+    setSelectedTrip("selectedTrip", tripData);
+  }, [setSelectedTrip]);
+
   const renderCell = useCallback((trip: TripDataTable, columnKey: Key) => {
     const cellValue = trip[columnKey as keyof TripDataTable];
 
@@ -170,21 +179,23 @@ export function TripsTable() {
         );
       case "actions":
         return (
-            <div className="relative flex items-center gap-4">
+            <div className="relative flex items-center">
               <Tooltip content="Details">
-                <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
+                <Button className="text-lg text-default-400 active:opacity-50" variant="light" size="sm">
                   <MaterialSymbol icon="visibility" size={20} />
-                </span>
+                </Button>
               </Tooltip>
               <Tooltip content="Edit Trip">
-                <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
-                  <MaterialSymbol icon="edit" size={20}/>
-                </span>
+                <Link to="/tripDetails">
+                  <Button className="text-lg text-default-400 active:opacity-50" variant="light" size="sm" onClick={handleSelectTripEdit(trip)}>
+                    <MaterialSymbol icon="edit" size={20}/>
+                  </Button>
+                </Link>
               </Tooltip>
               <Tooltip color="danger" content="Delete Trip" >
-                <span className="text-lg text-danger cursor-pointer active:opacity-50">
+                <Button className="text-lg text-danger active:opacity-50" variant="light" size="sm">
                   <ModalDeleteTrip trip={trip} />
-                </span>
+                </Button>
               </Tooltip>
             </div>
         );
@@ -200,7 +211,7 @@ export function TripsTable() {
           }
           return cellValue;
     }
-  }, []);
+  }, [handleSelectTripEdit]);
 
   const onNextPage = useCallback(() => {
     if (page < pages) {
@@ -370,7 +381,7 @@ export function TripsTable() {
         {(column) => (
           <TableColumn
             key={column.uid}
-            align={column.uid === "actions" ? "end" : "start"}
+            align={column.uid === "actions" ? "center" : "start"}
             allowsSorting={column.sortable}
           >
             {column.name}
