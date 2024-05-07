@@ -13,8 +13,6 @@ import { useCookies } from "react-cookie";
 
 export function TripDetailsBoard() {
 
-  const [onEdit, setOnEdit] = useState(false);
-
   const { data: cities, isLoading: isLoadingCities} = useQuery<City[], Error>({
     queryKey: ['cities'], 
     queryFn: async () => await getCities().then((data) => data.map((city) => ({id: city.id, name: city.name}))),
@@ -28,7 +26,10 @@ export function TripDetailsBoard() {
 
 
   const [cookies] = useCookies(['selectedTrip']);
+
   const selectedTrip = cookies.selectedTrip as SelectedTripCookies;
+
+  const [onEdit, setOnEdit] = useState(selectedTrip.type === 'edit');
 
   const { Field, handleSubmit, state } = useForm<TripCreate>({
     defaultValues: {
@@ -43,7 +44,7 @@ export function TripDetailsBoard() {
         console.log(value);
         console.log(state)
     },
-  });
+  });  
 
   if (isLoadingCities || isLoadingBuses) {
     return <div>Loading...</div>;
@@ -143,17 +144,17 @@ export function TripDetailsBoard() {
                   hideTimeZone
                   showMonthAndYearPickers
                   isRequired
-                  defaultValue={new ZonedDateTime(
+                  defaultValue={new Date(selectedTrip.trip.departureDate) instanceof Date ? new ZonedDateTime(
                     'era',
-                    state.value instanceof Date ? state.value.getUTCFullYear() : 0,
-                    state.value instanceof Date ? state.value.getUTCMonth() : 0,
-                    state.value instanceof Date ? state.value.getUTCDay() : 0,
+                    new Date(selectedTrip.trip.departureDate).getUTCFullYear(),
+                    new Date(selectedTrip.trip.departureDate).getUTCMonth(),
+                    new Date(selectedTrip.trip.departureDate).getUTCDay(),
                     'Europe/Lisbon',
                     -1, 
-                    state.value instanceof Date ? state.value.getUTCHours() : 0,
-                    state.value instanceof Date ? state.value.getUTCMinutes() : 0,
-                    state.value instanceof Date ? state.value.getUTCSeconds() : 0
-                  )}
+                    new Date(selectedTrip.trip.departureDate).getUTCHours(),
+                    new Date(selectedTrip.trip.departureDate).getUTCMinutes(),
+                    new Date(selectedTrip.trip.departureDate).getUTCSeconds()
+                  ): null }
                   onChange={(value: ZonedDateTime) => {
                     handleChange(value.toDate());
                   }}
@@ -174,16 +175,16 @@ export function TripDetailsBoard() {
                 hideTimeZone
                 showMonthAndYearPickers
                 isRequired
-                defaultValue={new ZonedDateTime(
+                defaultValue={new Date(selectedTrip.trip.arrivalDate) && new ZonedDateTime(
                   'era',
-                  state.value instanceof Date ? state.value.getUTCFullYear() : 0,
-                  state.value instanceof Date ? state.value.getUTCMonth() : 0,
-                  state.value instanceof Date ? state.value.getUTCDay() : 0,
+                  new Date(selectedTrip.trip.arrivalDate).getUTCFullYear(),
+                  new Date(selectedTrip.trip.arrivalDate).getUTCMonth(),
+                  new Date(selectedTrip.trip.arrivalDate).getUTCDay(),
                   'Europe/Lisbon',
                   -1, 
-                  state.value instanceof Date ? state.value.getUTCHours() : 0,
-                  state.value instanceof Date ? state.value.getUTCMinutes() : 0,
-                  state.value instanceof Date ? state.value.getUTCSeconds() : 0
+                  new Date(selectedTrip.trip.arrivalDate).getUTCHours(),
+                  new Date(selectedTrip.trip.arrivalDate).getUTCMinutes(),
+                  new Date(selectedTrip.trip.arrivalDate).getUTCSeconds()
                 )}
                 onChange={(value: ZonedDateTime) => {
                   handleChange(value.toDate());
@@ -215,7 +216,7 @@ export function TripDetailsBoard() {
                     <span className="text-default-400 text-small">€</span>
                   </div>
                 }
-                defaultValue={state.value? state.value.toString() : "0.00"}
+                defaultValue={selectedTrip.trip.price.toString()}
                 onChange={(e) => handleChange(Number.parseInt(e.target.value))}
                 onBlur={handleBlur}
                 variant="underlined"
@@ -240,7 +241,7 @@ export function TripDetailsBoard() {
                 isRequired
                 label="Bus ID"
                 defaultItems={buses}
-                defaultInputValue= {state.value && buses?.find(buses => buses.id == state.value.id) !== undefined ?  buses.find(buses => buses.id == state.value.id)?.id + " (" + buses.find(buses => buses.id == state.value.id)?.company + " - " + buses.find(buses => buses.id == state.value.id)?.capacity + " seats)" : ""}
+                defaultInputValue={`${selectedTrip.trip.bus} - ${selectedTrip.trip.busCapacity} Seats`}
                 onSelectionChange={(selectedValue) => {
                   const selectedbuses = buses?.find(buses => buses.id == selectedValue);
                   if (selectedbuses) {
@@ -258,23 +259,6 @@ export function TripDetailsBoard() {
               </Autocomplete>
               )}
               </Field>
-              <Input
-                isDisabled={!onEdit}
-                label="Company"
-                placeholder="Company Name"
-                className="w-full"
-                defaultValue="Company Name"
-                variant="underlined"
-              />
-              <Input
-                isDisabled={!onEdit}
-                label="Capacity"
-                placeholder="0.00"
-                className="w-full"
-                defaultValue="0.00"
-                disabled
-                variant="underlined"
-              />
             </div>
           </div>
           {state.errors && <span className="text-red-500">{state.errors}</span>}

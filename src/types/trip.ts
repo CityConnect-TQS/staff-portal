@@ -46,5 +46,5 @@ export type TripDataTable = &{
 
 export type SelectedTripCookies = & {
   trip: TripDataTable;
-  type: "edit" | "details" 
+  edit: boolean
 }
