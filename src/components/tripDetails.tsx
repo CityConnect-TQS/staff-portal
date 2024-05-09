@@ -55,7 +55,7 @@ export function TripDetailsBoard() {
     <div className="mx-16">
       <div className="flex flex-row gap-4 mt-8 justify-end">
         { onEdit &&         
-          <Button color="primary" onPress={() => { void handleSubmit() }}>
+          <Button color="primary" onPress={() => {() => handleSubmit() }}>
             Save
           </Button>
         }
@@ -147,7 +147,7 @@ export function TripDetailsBoard() {
                   hideTimeZone
                   showMonthAndYearPickers
                   isRequired
-                  defaultValue={new Date(selectedTrip.trip.departureDate) instanceof Date ? new ZonedDateTime(
+                  defaultValue={new ZonedDateTime(
                     'era',
                     new Date(selectedTrip.trip.departureDate).getUTCFullYear(),
                     new Date(selectedTrip.trip.departureDate).getUTCMonth(),
@@ -157,7 +157,7 @@ export function TripDetailsBoard() {
                     new Date(selectedTrip.trip.departureDate).getUTCHours(),
                     new Date(selectedTrip.trip.departureDate).getUTCMinutes(),
                     new Date(selectedTrip.trip.departureDate).getUTCSeconds()
-                  ): null }
+                  )}
                   onChange={(value: ZonedDateTime) => {
                     handleChange(value.toDate());
                   }}
@@ -179,7 +179,7 @@ export function TripDetailsBoard() {
                 hideTimeZone
                 showMonthAndYearPickers
                 isRequired
-                defaultValue={new Date(selectedTrip.trip.arrivalDate) && new ZonedDateTime(
+                defaultValue={new ZonedDateTime(
                   'era',
                   new Date(selectedTrip.trip.arrivalDate).getUTCFullYear(),
                   new Date(selectedTrip.trip.arrivalDate).getUTCMonth(),
