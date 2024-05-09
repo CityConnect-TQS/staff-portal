@@ -29,7 +29,7 @@ export function TripDetailsBoard() {
 
   const selectedTrip = cookies.selectedTrip as SelectedTripCookies;
 
-  const [onEdit, setOnEdit] = useState(selectedTrip.type === 'edit');
+  const [onEdit, setOnEdit] = useState(selectedTrip.edit);
 
   const { Field, handleSubmit, state } = useForm<TripCreate>({
     defaultValues: {
@@ -54,7 +54,7 @@ export function TripDetailsBoard() {
   return (
     <div className="mx-16">
       <div className="flex flex-row gap-4 mt-8 justify-end">
-        {onEdit &&         
+        { onEdit &&         
           <Button color="primary" onPress={() => { void handleSubmit() }}>
             Save
           </Button>
@@ -67,7 +67,7 @@ export function TripDetailsBoard() {
       </div>
       <form>
         <div className="flex flex-col mt-8">
-        <p>Trip Details</p>
+        <p className="font-medium text-2xl my-4">Trip Details</p>
          <div className="flex flex-row justify-center gap-8">
             <Field
                 name="departure"
@@ -82,6 +82,7 @@ export function TripDetailsBoard() {
                       id="filled-basic"
                       isRequired
                       label="Departure City"
+                      size="lg"
                       defaultItems={cities}
                       defaultInputValue= {selectedTrip.trip.departure}
                       onSelectionChange={(selectedValue) => {
@@ -112,6 +113,7 @@ export function TripDetailsBoard() {
                   isDisabled={!onEdit}
                   isRequired
                   label="Arrival cities"
+                  size="lg"
                   defaultItems={cities}
                   defaultInputValue= {selectedTrip.trip.arrival}
                   onSelectionChange={(selectedValue) => {
@@ -141,6 +143,7 @@ export function TripDetailsBoard() {
                   isDisabled={!onEdit}
                   label="Departure Date and Time"
                   variant="underlined"
+                  size="lg"
                   hideTimeZone
                   showMonthAndYearPickers
                   isRequired
@@ -172,6 +175,7 @@ export function TripDetailsBoard() {
                 isDisabled={!onEdit}
                 label="Arrival Date and Time"
                 variant="underlined"
+                size="lg"
                 hideTimeZone
                 showMonthAndYearPickers
                 isRequired
@@ -210,6 +214,7 @@ export function TripDetailsBoard() {
                 label="Price"
                 placeholder="0.00"
                 className="w-full"
+                size="lg"
                 isRequired
                 startContent={
                   <div className="pointer-events-none flex items-center">
@@ -227,7 +232,7 @@ export function TripDetailsBoard() {
             </Field>
           </div>
           <div className="flex flex-col mt-8">
-            <p>Bus Information</p>
+            <p className="font-medium text-2xl my-4">Bus Information</p>
             <div className="flex flex-row gap-8">
               <Field
               name="bus"
@@ -240,6 +245,7 @@ export function TripDetailsBoard() {
                 isDisabled={!onEdit}
                 isRequired
                 label="Bus ID"
+                size="lg"
                 defaultItems={buses}
                 defaultInputValue={`${selectedTrip.trip.bus} - ${selectedTrip.trip.busCapacity} Seats`}
                 onSelectionChange={(selectedValue) => {
@@ -264,7 +270,7 @@ export function TripDetailsBoard() {
           {state.errors && <span className="text-red-500">{state.errors}</span>}
       </form>
       <div className="flex mt-8">
-        <p>Reservations</p>
+        <p className="font-medium text-2xl my-4">Reservations</p>
       </div>
     </div>
   )

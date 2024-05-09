@@ -141,8 +141,8 @@ export function TripsTable() {
 
   const [, setSelectedTrip] = useCookies(["selectedTrip"]);
 
-  const handleSelectTripEdit = useCallback((trip: TripDataTable) => () => {
-    const tripData = JSON.stringify({ trip: trip, type: true});
+  const handleSelectTrip = useCallback((trip: TripDataTable, edit: boolean) => () => {
+    const tripData = JSON.stringify({ trip: trip, edit: edit });
     setSelectedTrip("selectedTrip", tripData);
   }, [setSelectedTrip]);
 
@@ -181,13 +181,15 @@ export function TripsTable() {
         return (
             <div className="relative flex items-center">
               <Tooltip content="Details">
-                <Button className="text-lg text-default-400 active:opacity-50" variant="light" size="sm">
-                  <MaterialSymbol icon="visibility" size={20} />
-                </Button>
+                <Link to="/tripDetails">
+                  <Button className="text-lg text-default-400 active:opacity-50" variant="light" size="sm" onClick={handleSelectTrip(trip, false)}>
+                    <MaterialSymbol icon="visibility" size={20} />
+                  </Button>
+                </Link>
               </Tooltip>
               <Tooltip content="Edit Trip">
                 <Link to="/tripDetails">
-                  <Button className="text-lg text-default-400 active:opacity-50" variant="light" size="sm" onClick={handleSelectTripEdit(trip)}>
+                  <Button className="text-lg text-default-400 active:opacity-50" variant="light" size="sm" onClick={handleSelectTrip(trip, true)}>
                     <MaterialSymbol icon="edit" size={20}/>
                   </Button>
                 </Link>
@@ -211,7 +213,7 @@ export function TripsTable() {
           }
           return cellValue;
     }
-  }, [handleSelectTripEdit]);
+  }, [handleSelectTrip]);
 
   const onNextPage = useCallback(() => {
     if (page < pages) {
