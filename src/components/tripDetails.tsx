@@ -41,8 +41,8 @@ export function TripDetailsBoard() {
         bus: {id: 0}
     },
     onSubmit: ({ value }) => {
-        console.log(value);
-        console.log(state)
+      console.log(value);
+
     },
   });  
 
@@ -55,7 +55,7 @@ export function TripDetailsBoard() {
     <div className="mx-16">
       <div className="flex flex-row gap-4 mt-8 justify-end">
         { onEdit &&         
-          <Button color="primary" onPress={() => {() => handleSubmit() }}>
+          <Button color="primary" onPress={() => { void handleSubmit() }}>
             Save
           </Button>
         }
