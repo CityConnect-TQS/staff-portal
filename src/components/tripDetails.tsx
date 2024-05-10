@@ -1,14 +1,16 @@
 import { getBuses } from "@/services/busService"
 import { getCities } from "@/services/cityService"
 import { useForm } from "@tanstack/react-form";
-import { ZonedDateTime, now, getLocalTimeZone } from '@internationalized/date';
+import { ZonedDateTime } from '@internationalized/date';
 import { Autocomplete, AutocompleteItem, Button, DatePicker, Input } from "@nextui-org/react";
 import { City } from "@/types/city";
 import { Bus } from "@/types/bus";
-import { useQuery } from "@tanstack/react-query";
-import { SelectedTripCookies, TripCreate } from "@/types/trip";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { SelectedTripCookies, TripCreate, TripDataTable } from "@/types/trip";
 import { useState } from "react";
 import { useCookies } from "react-cookie";
+import { updateTrip } from "@/services/tripService";
+import { MaterialSymbol } from "react-material-symbols";
 
 
 export function TripDetailsBoard() {
@@ -24,8 +26,10 @@ export function TripDetailsBoard() {
     queryFn: () => getBuses().then((data) => data.map((bus) => ({id: bus.id, company: bus.company, capacity: bus.capacity}))),
   });
 
+  const queryClient = useQueryClient();
 
-  const [cookies] = useCookies(['selectedTrip']);
+
+  const [cookies, setCookies] = useCookies(['selectedTrip']);
 
   const selectedTrip = cookies.selectedTrip as SelectedTripCookies;
 
@@ -33,16 +37,74 @@ export function TripDetailsBoard() {
 
   const { Field, handleSubmit, state } = useForm<TripCreate>({
     defaultValues: {
-        departure: {id: 0},
-        departureTime: now(getLocalTimeZone()).toDate(),
-        arrivalTime: now(getLocalTimeZone()).toDate(),
-        arrival: {id: 0},
-        price: 0.00,
-        bus: {id: 0}
+        departure: {id: cities?.find(city => city.name === selectedTrip.trip.departure)?.id ??  0},
+        departureTime: selectedTrip.trip.departureDate,
+        arrivalTime: selectedTrip.trip.arrivalDate,
+        arrival: {id: cities?.find(city => city.name === selectedTrip.trip.arrival)?.id ?? 0},
+        price: selectedTrip.trip.price,
+        bus: {id: buses?.find(bus => bus.company === selectedTrip.trip.bus)?.id ?? 0},
     },
-    onSubmit: ({ value }) => {
-      console.log(value);
+    onSubmit: async ({ value }) => {
+      const departureCity = cities?.find(city => city.id == value.departure.id);
+      const arrivalCity = cities?.find(city => city.id == value.arrival.id);
+      const bus = buses?.find(bus => bus.id == value.bus.id);
+      const departureTime =  new Date(value.departureTime).toISOString().slice(0, 19);
+      const arrivalTime = new Date(value.arrivalTime).toISOString().slice(0, 19);
+      const price = value.price;
 
+      if (!departureCity || !arrivalCity || !bus || !departureTime || !arrivalTime) {
+        console.error('Error: Invalid data');
+        return;
+      }
+      const trip: TripCreate = {
+        departure: departureCity,
+        departureTime: departureTime,
+        arrival: arrivalCity,
+        arrivalTime: arrivalTime,
+        price: price,
+        bus: bus,
+      };
+      
+      const tripCreated = await updateTrip(selectedTrip.trip.id ,trip).catch((error) => {
+         console.error('Error:', error);
+         return;
+       });
+  
+      if (!tripCreated) {
+        return;
+      }
+
+      const tripUpdated : TripDataTable = {
+        id: tripCreated.id,
+        departure: tripCreated.departure.name,
+        departureDate: new Date(tripCreated.departureTime),
+        arrival: tripCreated.arrival.name,
+        arrivalDate: new Date(tripCreated.arrivalTime),
+        price: tripCreated.price,
+        bus: tripCreated.bus.company,
+        busCapacity: tripCreated.bus.capacity,
+        freeSeats: selectedTrip.trip.freeSeats,
+        status: selectedTrip.trip.status,
+      }
+
+      setCookies('selectedTrip', JSON.stringify({trip: tripUpdated, edit: false}));
+      setOnEdit(false);
+  
+      await queryClient.invalidateQueries({queryKey: ['trips']});
+
+    },
+    validators: {
+      onSubmit: (value) => {
+        if (value.value.departureTime >= value.value.arrivalTime) {
+          return 'The departure date and time must be less than the arrival date and time.';
+        }
+        if (value.value.departure.id === value.value.arrival.id) {
+          return 'The departure city must be different from the arrival city.';
+        }
+        if (value.value.departureTime.toString() === value.value.arrivalTime.toString()) {
+          return 'The departure date and time must be different from the arrival date and time.';
+        }
+      },
     },
   });  
 
@@ -53,20 +115,21 @@ export function TripDetailsBoard() {
 
   return (
     <div className="mx-16">
-      <div className="flex flex-row gap-4 mt-8 justify-end">
+      <div className="flex flex-row gap-4 justify-end">
         { onEdit &&         
-          <Button color="primary" onPress={() => { void handleSubmit() }}>
-            Save
+          <Button color="primary" onPress={() => {void handleSubmit()}} variant="flat">
+            <MaterialSymbol icon="save" size={20}/> Save
           </Button>
         }
         { !onEdit &&
-          <Button color="primary" onPress={() => { setOnEdit(true) }}>
+          <Button color="secondary" onPress={() => { setOnEdit(true) }} variant="flat">
+            <MaterialSymbol icon="edit" size={20}/>
             Edit
           </Button>
         }
       </div>
       <form>
-        <div className="flex flex-col mt-8">
+        <div className="flex flex-col">
         <p className="font-medium text-2xl my-4">Trip Details</p>
          <div className="flex flex-row justify-center gap-8">
             <Field
@@ -150,8 +213,8 @@ export function TripDetailsBoard() {
                   defaultValue={new ZonedDateTime(
                     'era',
                     new Date(selectedTrip.trip.departureDate).getUTCFullYear(),
-                    new Date(selectedTrip.trip.departureDate).getUTCMonth(),
-                    new Date(selectedTrip.trip.departureDate).getUTCDay(),
+                    new Date(selectedTrip.trip.departureDate).getUTCMonth() + 1,
+                    new Date(selectedTrip.trip.departureDate).getUTCDate(),
                     'Europe/Lisbon',
                     -1, 
                     new Date(selectedTrip.trip.departureDate).getUTCHours(),
@@ -182,8 +245,8 @@ export function TripDetailsBoard() {
                 defaultValue={new ZonedDateTime(
                   'era',
                   new Date(selectedTrip.trip.arrivalDate).getUTCFullYear(),
-                  new Date(selectedTrip.trip.arrivalDate).getUTCMonth(),
-                  new Date(selectedTrip.trip.arrivalDate).getUTCDay(),
+                  new Date(selectedTrip.trip.arrivalDate).getUTCMonth() + 1,
+                  new Date(selectedTrip.trip.arrivalDate).getUTCDate(),
                   'Europe/Lisbon',
                   -1, 
                   new Date(selectedTrip.trip.arrivalDate).getUTCHours(),

@@ -9,7 +9,7 @@ export const Route = createLazyFileRoute('/tripDetails')({
 function TripDetails() {
 
   return (
-    <div>
+    <div className="flex flex-col gap-16 p-2">
       <NavbarStaff />
       <div>  
         <TripDetailsBoard />
