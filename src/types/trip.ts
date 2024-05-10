@@ -43,3 +43,8 @@ export type TripDataTable = &{
   busCapacity: number;
   status: string;
 }
+
+export type SelectedTripCookies = & {
+  trip: TripDataTable;
+  edit: boolean
+}
