@@ -1,7 +1,7 @@
 import { getBuses } from "@/services/busService"
 import { getCities } from "@/services/cityService"
 import { useForm } from "@tanstack/react-form";
-import { ZonedDateTime, now, getLocalTimeZone } from '@internationalized/date';
+import { ZonedDateTime } from '@internationalized/date';
 import { Autocomplete, AutocompleteItem, Button, DatePicker, Input } from "@nextui-org/react";
 import { City } from "@/types/city";
 import { Bus } from "@/types/bus";
@@ -68,7 +68,7 @@ export function TripDetailsBoard() {
     <div className="mx-16">
       <div className="flex flex-row gap-4 justify-end">
         { onEdit &&         
-          <Button color="primary" onPress={() => {handleSubmit()}}>
+          <Button color="primary" onPress={() => {void handleSubmit()}}>
             Save
           </Button>
         }

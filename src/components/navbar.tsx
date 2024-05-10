@@ -29,7 +29,7 @@ export function NavbarStaff() {
       <NavbarContent className="hidden sm:flex gap-4" justify="center">
         {menuItems.map((item, index) => (
           <NavbarItem key={`${item.name}-${index}`}>
-            <Button color={item.isActive? "primary" : "default"} variant="light" onPress={()  =>  navigate({to: item.link})}> 
+            <Button color={item.isActive? "primary" : "default"} variant="light" onPress={()  => void navigate({to: item.link})}> 
               {item.name}
             </Button>
           </NavbarItem>
@@ -49,7 +49,7 @@ export function NavbarStaff() {
       <NavbarMenu>
         {menuItems.map((item, index) => (
           <NavbarMenuItem key={`${item.name}-${index}`}>
-            <Button color={item.isActive? "primary" : "default"} variant="light" onPress={() => navigate({to: item.link})}> 
+            <Button color={item.isActive? "primary" : "default"} variant="light" onPress={() => void navigate({to: item.link})}> 
               {item.name}
             </Button>
           </NavbarMenuItem>
