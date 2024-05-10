@@ -82,10 +82,10 @@ export const updateTrip = async (id: number, trip: TripCreate): Promise<Trip> =>
     body: JSON.stringify(trip),
   }).then((res) => res.json() as Promise<Trip>);
 
-export const deleteTrip = async (id: number): Promise<undefined> =>
+export const deleteTrip = async (id: number) =>
   fetch(BACKOFFICE_BASE_API_URL + "trip/" + id, {
     method: "DELETE",
     headers: {
       "Content-Type": "application/json",
     },
-  }).then((res) => res.json() as Promise<undefined>);
+  }).then((res) => res.status === 200);
