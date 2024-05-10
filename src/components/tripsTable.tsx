@@ -1,5 +1,5 @@
 import { getTrips } from "@/services/tripService";
-import { Trip } from "@/types/trip";
+import { Trip, TripDataTable } from "@/types/trip";
 import {
   Table,
   TableHeader,
@@ -17,17 +17,21 @@ import {
   Pagination,
   Selection,
   ChipProps,
-  SortDescriptor
+  SortDescriptor,
+  Tooltip
 } from "@nextui-org/react";
 import { useQuery } from "@tanstack/react-query";
 import { ChangeEvent, Key, useCallback, useMemo, useState } from "react";
 import { MaterialSymbol } from "react-material-symbols";
 import { ModalCreateTrip } from "./modalCreateTrip";
+import { ModalDeleteTrip } from "./modalDeleteTrip";
+import { Link } from "@tanstack/react-router";
+import { useCookies } from "react-cookie";
 
 const statusColorMap: Record<string, ChipProps["color"]> = {
   active: "success",
-  full: "danger",
-  completed: "warning",
+  full: "warning",
+  completed: "danger",
 };
 
 const INITIAL_VISIBLE_COLUMNS = ["departure" ,"arrival", "price" ,"status", "actions"];
@@ -55,19 +59,6 @@ function capitalize(str: string) {
     return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
-interface TripDataTable {
-    id: number;
-    departure: string;
-    arrival: string;
-    departureDate: Date;
-    arrivalDate: Date;
-    price: number;
-    freeSeats: number;
-    bus: string;
-    busCapacity: number;
-    status: string;
-}
-
 export function TripsTable() {
   const [filterValue, setFilterValue] = useState("");
   const [selectedKeys, setSelectedKeys] = useState<Selection>(new Set([]));
@@ -80,26 +71,26 @@ export function TripsTable() {
   });
 
 
-   const {data: trips} = useQuery<Trip[], Error>({
-    queryKey: ['trips'], 
-    queryFn: () => getTrips().then((data) => data.map((trip) => ({...trip, departureTime: new Date(trip.departureTime), arrivalTime: new Date(trip.arrivalTime)}))),
-   });
+  const {data: trips} = useQuery<Trip[], Error>({
+   queryKey: ['trips'], 
+   queryFn: () => getTrips().then((data) => data.map((trip) => ({...trip, departureTime: new Date(trip.departureTime), arrivalTime: new Date(trip.arrivalTime)}))),
+  });
 
 
-   const tripsData = useMemo(() => {
-    return trips?.map((trip) => ({
-       id: trip.id,
-       departure: trip.departure.name,
-       arrival: trip.arrival.name,
-       departureDate: trip.departureTime,
-       arrivalDate: trip.arrivalTime,
-       price: trip.price,
-       freeSeats: trip.freeSeats,
-       bus: trip.bus.company,
-       busCapacity: trip.bus.capacity,
-       status: trip.departureTime > new Date() && trip.freeSeats > 0 ? "Active" : trip.departureTime > new Date() && trip.freeSeats <= 0 ? "Full" : "Completed",
-    })) ?? [];
-   }, [trips]);
+  const tripsData = useMemo(() => {
+   return trips?.map((trip) => ({
+      id: trip.id,
+      departure: trip.departure.name,
+      arrival: trip.arrival.name,
+      departureDate: trip.departureTime,
+      arrivalDate: trip.arrivalTime,
+      price: trip.price,
+      freeSeats: trip.freeSeats,
+      bus: trip.bus.company,
+      busCapacity: trip.bus.capacity,
+      status: trip.departureTime > new Date() && trip.freeSeats > 0 ? "Active" : trip.departureTime > new Date() && trip.freeSeats <= 0 ? "Full" : "Completed",
+   })) ?? [];
+  }, [trips]);
 
   const [page, setPage] = useState(1);
 
@@ -148,6 +139,13 @@ export function TripsTable() {
     });
   }, [sortDescriptor, items]);
 
+  const [, setSelectedTrip] = useCookies(["selectedTrip"]);
+
+  const handleSelectTrip = useCallback((trip: TripDataTable, edit: boolean) => () => {
+    const tripData = JSON.stringify({ trip: trip, edit: edit });
+    setSelectedTrip("selectedTrip", tripData);
+  }, [setSelectedTrip]);
+
   const renderCell = useCallback((trip: TripDataTable, columnKey: Key) => {
     const cellValue = trip[columnKey as keyof TripDataTable];
 
@@ -181,20 +179,27 @@ export function TripsTable() {
         );
       case "actions":
         return (
-          <div className="relative flex justify-end items-center gap-2">
-            <Dropdown>
-              <DropdownTrigger>
-                <Button isIconOnly size="sm" variant="light">
-                    <MaterialSymbol icon="more_vert" size={20} />
+            <div className="relative flex items-center">
+              <Tooltip content="Details">
+                <Link to="/tripDetails">
+                  <Button className="text-lg text-default-400 active:opacity-50" variant="light" size="sm" onClick={handleSelectTrip(trip, false)}>
+                    <MaterialSymbol icon="visibility" size={20} />
+                  </Button>
+                </Link>
+              </Tooltip>
+              <Tooltip content="Edit Trip">
+                <Link to="/tripDetails">
+                  <Button className="text-lg text-default-400 active:opacity-50" variant="light" size="sm" onClick={handleSelectTrip(trip, true)}>
+                    <MaterialSymbol icon="edit" size={20}/>
+                  </Button>
+                </Link>
+              </Tooltip>
+              <Tooltip color="danger" content="Delete Trip" >
+                <Button className="text-lg text-danger active:opacity-50" variant="light" size="sm">
+                  <ModalDeleteTrip trip={trip} />
                 </Button>
-              </DropdownTrigger>
-              <DropdownMenu>
-                <DropdownItem>View</DropdownItem>
-                <DropdownItem>Edit</DropdownItem>
-                <DropdownItem>Delete</DropdownItem>
-              </DropdownMenu>
-            </Dropdown>
-          </div>
+              </Tooltip>
+            </div>
         );
       default:
         if (cellValue instanceof Date) {
@@ -208,7 +213,7 @@ export function TripsTable() {
           }
           return cellValue;
     }
-  }, []);
+  }, [handleSelectTrip]);
 
   const onNextPage = useCallback(() => {
     if (page < pages) {
@@ -321,11 +326,6 @@ export function TripsTable() {
   const bottomContent = useMemo(() => {
     return (
       <div className="py-2 px-2 flex justify-between items-center">
-        <span className="w-[30%] text-small text-default-400">
-          {selectedKeys === "all"
-            ? "All items selected"
-            : `${selectedKeys.size} of ${filteredItems.length} selected`}
-        </span>
         <Pagination
           isCompact
           showControls
@@ -345,9 +345,25 @@ export function TripsTable() {
         </div>
       </div>
     );
-  }, [selectedKeys, filteredItems.length, page, pages, onPreviousPage, onNextPage]);
+  }, [page, pages, onPreviousPage, onNextPage]);
+
+  interface Alert {
+    message: string;
+    type: "success" | "warning" ; 
+    active: boolean;  
+  }
+
+  const { data: alerts } = useQuery<Alert, Error>({
+   queryKey: ['alerts']
+  });
 
   return (
+    <div className="flex flex-col gap-4">
+      {alerts?.active && ( 
+        <Chip color={alerts.type} variant="flat" radius="sm">
+            {alerts.message}
+        </Chip>
+      )}
     <Table
       aria-label="Trips Table"
       isHeaderSticky
@@ -382,5 +398,6 @@ export function TripsTable() {
         )}
       </TableBody>
     </Table>
+    </div>
   );
 }
