@@ -141,14 +141,14 @@ export function TripsTable() {
     });
   }, [sortDescriptor, items]);
 
-  const [, setSelectedTrip] = useCookies(["selectedTrip"]);
+  const [, setCookies] = useCookies(["selectedTrip"]);
 
   const handleSelectTrip = useCallback((trip: TripDataTable, edit: boolean) => () => {
     const tripData = JSON.stringify({ trip: trip, edit: edit });
-    setSelectedTrip("selectedTrip", tripData);
+    setCookies("selectedTrip", tripData);
     void navigate({ to: "/tripDetails" });
 
-  }, [navigate, setSelectedTrip]);
+  }, [navigate, setCookies]);
 
   const renderCell = useCallback((trip: TripDataTable, columnKey: Key) => {
     const cellValue = trip[columnKey as keyof TripDataTable];
@@ -261,7 +261,7 @@ export function TripsTable() {
           />
           <div className="flex gap-3">
             <Dropdown>
-              <DropdownTrigger className="hidden sm:flex">
+              <DropdownTrigger className="hidden sm:flex" >
                 <Button endContent={<MaterialSymbol icon="expand_more" />} variant="flat">
                   Status
                 </Button>

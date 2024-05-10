@@ -80,6 +80,7 @@ export const updateTrip = async (id: number, trip: TripCreate): Promise<Trip> =>
       "Content-Type": "application/json",
     },
     body: JSON.stringify(trip),
+  
   }).then((res) => res.json() as Promise<Trip>);
 
 export const deleteTrip = async (id: number) =>
