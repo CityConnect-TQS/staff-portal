@@ -33,16 +33,29 @@ export function TripDetailsBoard() {
 
   const { Field, handleSubmit, state } = useForm<TripCreate>({
     defaultValues: {
-        departure: {id: 0},
-        departureTime: now(getLocalTimeZone()).toDate(),
-        arrivalTime: now(getLocalTimeZone()).toDate(),
-        arrival: {id: 0},
-        price: 0.00,
-        bus: {id: 0}
+        departure: {id: cities?.find(city => city.name === selectedTrip.trip.departure)?.id ??  0},
+        departureTime: selectedTrip.trip.departureDate,
+        arrivalTime: selectedTrip.trip.arrivalDate,
+        arrival: {id: cities?.find(city => city.name === selectedTrip.trip.arrival)?.id ?? 0},
+        price: selectedTrip.trip.price,
+        bus: {id: buses?.find(bus => bus.company === selectedTrip.trip.bus)?.id ?? 0},
     },
     onSubmit: ({ value }) => {
       console.log(value);
 
+    },
+    validators: {
+      onSubmit: (value) => {
+        if (value.value.departureTime >= value.value.arrivalTime) {
+          return 'The departure date and time must be less than the arrival date and time.';
+        }
+        if (value.value.departure.id === value.value.arrival.id) {
+          return 'The departure city must be different from the arrival city.';
+        }
+        if (value.value.departureTime.toString() === value.value.arrivalTime.toString()) {
+          return 'The departure date and time must be different from the arrival date and time.';
+        }
+      },
     },
   });  
 
@@ -55,7 +68,7 @@ export function TripDetailsBoard() {
     <div className="mx-16">
       <div className="flex flex-row gap-4 justify-end">
         { onEdit &&         
-          <Button color="primary" onPress={() => { void handleSubmit() }}>
+          <Button color="primary" onPress={() => {handleSubmit()}}>
             Save
           </Button>
         }
