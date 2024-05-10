@@ -25,7 +25,7 @@ import { ChangeEvent, Key, useCallback, useMemo, useState } from "react";
 import { MaterialSymbol } from "react-material-symbols";
 import { ModalCreateTrip } from "./modalCreateTrip";
 import { ModalDeleteTrip } from "./modalDeleteTrip";
-import { Link } from "@tanstack/react-router";
+import { useNavigate} from "@tanstack/react-router";
 import { useCookies } from "react-cookie";
 
 const statusColorMap: Record<string, ChipProps["color"]> = {
@@ -33,6 +33,7 @@ const statusColorMap: Record<string, ChipProps["color"]> = {
   full: "warning",
   completed: "danger",
 };
+
 
 const INITIAL_VISIBLE_COLUMNS = ["departure" ,"arrival", "price" ,"status", "actions"];
 
@@ -70,6 +71,7 @@ export function TripsTable() {
     direction: "ascending",
   });
 
+  const navigate = useNavigate();
 
   const {data: trips} = useQuery<Trip[], Error>({
    queryKey: ['trips'], 
@@ -144,7 +146,9 @@ export function TripsTable() {
   const handleSelectTrip = useCallback((trip: TripDataTable, edit: boolean) => () => {
     const tripData = JSON.stringify({ trip: trip, edit: edit });
     setSelectedTrip("selectedTrip", tripData);
-  }, [setSelectedTrip]);
+    void navigate({ to: "/tripDetails" });
+
+  }, [navigate, setSelectedTrip]);
 
   const renderCell = useCallback((trip: TripDataTable, columnKey: Key) => {
     const cellValue = trip[columnKey as keyof TripDataTable];
@@ -181,18 +185,14 @@ export function TripsTable() {
         return (
             <div className="relative flex items-center">
               <Tooltip content="Details">
-                <Link to="/tripDetails">
-                  <Button className="text-lg text-default-400 active:opacity-50" variant="light" size="sm" onClick={handleSelectTrip(trip, false)}>
-                    <MaterialSymbol icon="visibility" size={20} />
-                  </Button>
-                </Link>
+                <Button className="text-lg text-default-400 active:opacity-50"  variant="light" size="sm" onClick={handleSelectTrip(trip, false)}>
+                  <MaterialSymbol icon="visibility" size={20} />
+                </Button>
               </Tooltip>
               <Tooltip content="Edit Trip">
-                <Link to="/tripDetails">
-                  <Button className="text-lg text-default-400 active:opacity-50" variant="light" size="sm" onClick={handleSelectTrip(trip, true)}>
-                    <MaterialSymbol icon="edit" size={20}/>
-                  </Button>
-                </Link>
+                <Button className="text-lg text-default-400 active:opacity-50" variant="light" size="sm" onClick={handleSelectTrip(trip, true)}>
+                  <MaterialSymbol icon="edit" size={20}/>
+                </Button>
               </Tooltip>
               <Tooltip color="danger" content="Delete Trip" >
                 <Button className="text-lg text-danger active:opacity-50" variant="light" size="sm">

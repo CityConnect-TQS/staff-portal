@@ -1,23 +1,23 @@
 import {Navbar, NavbarBrand, NavbarContent, NavbarItem, NavbarMenuToggle, NavbarMenu, NavbarMenuItem, Link, Button} from "@nextui-org/react";
 import {useState} from "react";
 import { ThemeSwitcher } from "./themeSwitcher";
-import { useMatchRoute } from '@tanstack/react-router';
+import { useMatchRoute, useNavigate } from '@tanstack/react-router';
 
 export function NavbarStaff() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const matchRoute = useMatchRoute()
+  const matchRoute = useMatchRoute();
+  const navigate = useNavigate(); // Removido o objeto desnecessário
   
   const menuItems = [
     {name: "Dashboard", link: "/", isActive: matchRoute({ to: "/" })!== false || matchRoute({ to: "/tripDetails" })!== false},
-    {name: "About", link: "/about", isActive: matchRoute({ to: "/about" }) !== false},
- ];
-
+    {name: "About", link: "/about", isActive: matchRoute({ to: "/about" })!== false},
+  ];
 
   return (
     <Navbar onMenuOpenChange={setIsMenuOpen}>
       <NavbarContent>
         <NavbarMenuToggle
-          aria-label={isMenuOpen ? "Close menu" : "Open menu"}
+          aria-label={isMenuOpen? "Close menu" : "Open menu"}
           className="sm:hidden"
         />
         <NavbarBrand>
@@ -29,15 +29,9 @@ export function NavbarStaff() {
       <NavbarContent className="hidden sm:flex gap-4" justify="center">
         {menuItems.map((item, index) => (
           <NavbarItem key={`${item.name}-${index}`}>
-            <Link
-              color={
-                item.isActive ? "primary" : "foreground"
-              }
-              href={item.link}
-              size="lg"
-            >
+            <Button color={item.isActive? "primary" : "default"} variant="light" onPress={()  =>  navigate({to: item.link})}> 
               {item.name}
-            </Link>
+            </Button>
           </NavbarItem>
         ))}
       </NavbarContent>
@@ -55,15 +49,9 @@ export function NavbarStaff() {
       <NavbarMenu>
         {menuItems.map((item, index) => (
           <NavbarMenuItem key={`${item.name}-${index}`}>
-            <Link
-              color={
-                item.isActive ? "primary" : "foreground"
-              }
-              href={item.link}
-              size="lg"
-            >
+            <Button color={item.isActive? "primary" : "default"} variant="light" onPress={() => navigate({to: item.link})}> 
               {item.name}
-            </Link>
+            </Button>
           </NavbarMenuItem>
         ))}
       </NavbarMenu>

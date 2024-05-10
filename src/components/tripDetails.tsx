@@ -53,7 +53,7 @@ export function TripDetailsBoard() {
 
   return (
     <div className="mx-16">
-      <div className="flex flex-row gap-4 mt-8 justify-end">
+      <div className="flex flex-row gap-4 justify-end">
         { onEdit &&         
           <Button color="primary" onPress={() => { void handleSubmit() }}>
             Save
@@ -66,7 +66,7 @@ export function TripDetailsBoard() {
         }
       </div>
       <form>
-        <div className="flex flex-col mt-8">
+        <div className="flex flex-col">
         <p className="font-medium text-2xl my-4">Trip Details</p>
          <div className="flex flex-row justify-center gap-8">
             <Field
