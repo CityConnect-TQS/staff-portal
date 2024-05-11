@@ -1,10 +1,10 @@
 import { deleteTrip } from "@/services/tripService";
-import { TripDataTable } from "@/types/trip";
+import { Trip } from "@/types/trip";
 import {Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, useDisclosure} from "@nextui-org/react";
 import { useQueryClient } from "@tanstack/react-query";
 import { MaterialSymbol } from "react-material-symbols";
 
-export function ModalDeleteTrip({ trip }: { trip: TripDataTable }) {
+export function ModalDeleteTrip({ trip }: { trip: Trip }) {
   const {isOpen, onOpen, onOpenChange} = useDisclosure();
 
   const queryClient = useQueryClient();
@@ -40,10 +40,10 @@ export function ModalDeleteTrip({ trip }: { trip: TripDataTable }) {
         <ModalContent>
           {(onClose) => (
             <>
-              <ModalHeader className="flex flex-col gap-1">Delete Trip {trip.departure} - {trip.arrival}</ModalHeader>
+              <ModalHeader className="flex flex-col gap-1">Delete Trip {trip.departure.name} - {trip.arrival.name}</ModalHeader>
               <ModalBody>
                 <p> 
-                    Are you sure you want to delete the trip from {trip.departure} on {trip.departureDate.toLocaleString("en-US", { day: "numeric", month: "long", year: "numeric", hour: "numeric", minute: "numeric"})} to {trip.arrival} on {trip.arrivalDate.toLocaleString("en-US", { day: "numeric", month: "long", year: "numeric", hour: "numeric", minute: "numeric"})}?
+                    Are you sure you want to delete the trip from {trip.departure.name} on {trip.departureTime.toLocaleString("en-US", { day: "numeric", month: "long", year: "numeric", hour: "numeric", minute: "numeric"})} to {trip.arrival.name} on {trip.arrivalTime.toLocaleString("en-US", { day: "numeric", month: "long", year: "numeric", hour: "numeric", minute: "numeric"})}?
                 </p>
 
               </ModalBody>
