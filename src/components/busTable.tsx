@@ -1,22 +1,36 @@
 
 import { Bus } from "@/types/bus";
-import {Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Pagination, getKeyValue, Button} from "@nextui-org/react";
+import {Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Pagination, getKeyValue, Button, SortDescriptor} from "@nextui-org/react";
 import {useMemo, useState } from "react";
 import { MaterialSymbol } from "react-material-symbols";
 
 export function BusTable({buses}: {buses: Bus[]}) {
   const [page, setPage] = useState(1);
-  const rowsPerPage = 5;
-
+  const rowsPerPage = 4;
+  const [sortDescriptor, setSortDescriptor] = useState<SortDescriptor>({
+    column: "id",
+    direction: "ascending",
+  });
 
   const pages = Math.ceil(buses.length / rowsPerPage);
+
+  const sortedItems = useMemo(() => {
+    return [...buses].sort((a: Bus, b: Bus) => {
+      const first = a[sortDescriptor.column as keyof Bus] as number;
+      const second = b[sortDescriptor.column as keyof Bus] as number;
+      const cmp = first < second ? -1 : first > second ? 1 : 0;
+
+      return sortDescriptor.direction === "descending" ? -cmp : cmp;
+    });
+  }, [buses, sortDescriptor.column, sortDescriptor.direction]);
 
   const items = useMemo(() => {
     const start = (page - 1) * rowsPerPage;
     const end = start + rowsPerPage;
 
-    return buses?.slice(start, end)?? [];
-  }, [page, buses]);
+    return sortedItems?.slice(start, end)?? [];
+  }, [page, sortedItems]);
+
 
   return (
     <Table 
@@ -39,14 +53,16 @@ export function BusTable({buses}: {buses: Bus[]}) {
     }}
     fullWidth
     align="center"
+    sortDescriptor={sortDescriptor}
+    onSortChange={setSortDescriptor}
     
   >
     <TableHeader >
       <TableColumn key="id" align="center" >ID</TableColumn>
-      <TableColumn key="capacity" align="center">CAPACITY</TableColumn>
+      <TableColumn key="capacity" align="center" allowsSorting>CAPACITY</TableColumn>
       <TableColumn key="actions" align="center">ACTIONS</TableColumn>
     </TableHeader>
-    <TableBody items={items}>
+    <TableBody emptyContent={"No trips found"} items={items}>
       {(item) => (
         <TableRow key={item.id}>
           {Object.keys(item).map((columnKey) => (

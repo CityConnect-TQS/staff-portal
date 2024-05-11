@@ -1,11 +1,10 @@
 import { BusTable } from '@/components/busTable'
+import { ModalCreateBus } from '@/components/modalCreateBus'
 import { NavbarStaff } from '@/components/navbar'
 import { getBuses } from '@/services/busService'
 import { Bus } from '@/types/bus'
-import { Button } from '@nextui-org/react'
 import { useQuery } from '@tanstack/react-query'
 import { createLazyFileRoute } from '@tanstack/react-router'
-import { MaterialSymbol } from 'react-material-symbols'
 
 export const Route = createLazyFileRoute('/bus')({
   component: Buses,
@@ -32,6 +31,7 @@ function Buses() {
         return acc;
     }, []);
 
+
     if (isLoading || !busGroups) {
         return <div>Loading...</div>
     }
@@ -39,14 +39,15 @@ function Buses() {
     return (
         <div className="flex flex-col gap-16 p-2">
         <NavbarStaff />
+        <div className='flex mx-8 justify-end'>
+            <ModalCreateBus company="" />
+        </div>
         <div className='grid grid-cols-4 gap-16 mx-8'>
             {busGroups?.map((group, index) => (
                 <div key={index}>
                     <div className='flex flex-row justify-between'>
                         <h2 className='text-xl font-medium mb-4'>{group.company}</h2>
-                        <Button variant="flat" color="primary" size="sm">
-                            <MaterialSymbol icon="add" size={22} />
-                        </Button>
+                        <ModalCreateBus company={group.company} />
                     </div>
                     <BusTable buses={group.buses} />
                 </div>
