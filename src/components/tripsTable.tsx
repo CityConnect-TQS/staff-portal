@@ -124,22 +124,24 @@ export function TripsTable() {
 
   const pages = Math.ceil(filteredItems.length / rowsPerPage);
 
-  const items = useMemo(() => {
-    const start = (page - 1) * rowsPerPage;
-    const end = start + rowsPerPage;
-
-    return filteredItems.slice(start, end);
-  }, [page, filteredItems, rowsPerPage]);
 
   const sortedItems = useMemo(() => {
-    return [...items].sort((a: TripDataTable, b: TripDataTable) => {
+    return [...filteredItems].sort((a: TripDataTable, b: TripDataTable) => {
       const first = a[sortDescriptor.column as keyof TripDataTable] as number;
       const second = b[sortDescriptor.column as keyof TripDataTable] as number;
       const cmp = first < second ? -1 : first > second ? 1 : 0;
 
       return sortDescriptor.direction === "descending" ? -cmp : cmp;
     });
-  }, [sortDescriptor, items]);
+  }, [filteredItems, sortDescriptor.column, sortDescriptor.direction]);
+
+  const items = useMemo(() => {
+    const start = (page - 1) * rowsPerPage;
+    const end = start + rowsPerPage;
+
+    return sortedItems.slice(start, end);
+  }, [page, rowsPerPage, sortedItems]);
+
 
   const [, setCookies] = useCookies(["selectedTrip"]);
 
@@ -390,7 +392,7 @@ export function TripsTable() {
           </TableColumn>
         )}
       </TableHeader>
-      <TableBody emptyContent={"No trips found"} items={sortedItems}>
+      <TableBody emptyContent={"No trips found"} items={items}>
         {(item) => (
           <TableRow key={item.id}>
             {(columnKey) => <TableCell>{renderCell(item, columnKey)}</TableCell>}

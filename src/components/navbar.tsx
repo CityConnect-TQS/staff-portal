@@ -10,11 +10,11 @@ export function NavbarStaff() {
   
   const menuItems = [
     {name: "Dashboard", link: "/", isActive: matchRoute({ to: "/" })!== false || matchRoute({ to: "/tripDetails" })!== false},
-    {name: "About", link: "/about", isActive: matchRoute({ to: "/about" })!== false},
+    {name: "Buses", link: "/bus", isActive: matchRoute({ to: "/bus" })!== false},
   ];
 
   return (
-    <Navbar onMenuOpenChange={setIsMenuOpen}>
+    <Navbar onMenuOpenChange={setIsMenuOpen} maxWidth="full">
       <NavbarContent>
         <NavbarMenuToggle
           aria-label={isMenuOpen? "Close menu" : "Open menu"}
@@ -22,14 +22,14 @@ export function NavbarStaff() {
         />
         <NavbarBrand>
           <img src="/logo.svg" alt="CityConnect" className="h-8 mr-4 w-auto rounded" />
-          <p className="font-bold text-inherit">CityConnect</p>
+          <p className="font-bold text-inherit text-xl">CityConnect</p>
         </NavbarBrand>
       </NavbarContent>
 
       <NavbarContent className="hidden sm:flex gap-4" justify="center">
         {menuItems.map((item, index) => (
           <NavbarItem key={`${item.name}-${index}`}>
-            <Button color={item.isActive? "primary" : "default"} variant="light" onPress={()  => void navigate({to: item.link})}> 
+            <Button color={item.isActive? "primary" : "default"} variant="light" size="lg" className="text-lg" onPress={()  => void navigate({to: item.link})}> 
               {item.name}
             </Button>
           </NavbarItem>
@@ -37,11 +37,11 @@ export function NavbarStaff() {
       </NavbarContent>
       <NavbarContent justify="end">
       <ThemeSwitcher />
-        <NavbarItem className="hidden lg:flex ">
-          <Link href="#" className="text-primary">Login</Link>
+        <NavbarItem className="hidden lg:flex">
+          <Link href="#" className="text-primary" size="lg">Login</Link>
         </NavbarItem>
         <NavbarItem>
-          <Button as={Link} href="#" variant="flat">
+          <Button as={Link} href="#" variant="flat" size="lg">
             Sign Up
           </Button>
         </NavbarItem>
