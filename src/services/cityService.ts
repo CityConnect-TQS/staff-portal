@@ -1,5 +1,5 @@
 import { City, CityCreate } from "@/types/city";
-import { BACKOFFICE_BASE_API_URL } from "./config";
+import { BACKOFFICE_BASE_API_URL, PUBLIC_BASE_API_URL } from "./config";
 
 
 
@@ -14,7 +14,7 @@ export const createCity = async (city: CityCreate): Promise<City> =>
 
  export const getCities = async (name?: string): Promise<City[]> => {
     return fetch(
-        BACKOFFICE_BASE_API_URL +
+      PUBLIC_BASE_API_URL +
         "city" +
         (typeof name !== "undefined" ? "?name=" + name : ""),
         {
@@ -26,7 +26,7 @@ export const createCity = async (city: CityCreate): Promise<City> =>
 };
 
 export const getCity = async (id: number): Promise<City> =>
-  fetch(BACKOFFICE_BASE_API_URL + "city/" + id, {
+  fetch(PUBLIC_BASE_API_URL + "city/" + id, {
     headers: {
       "Content-Type": "application/json",
     },

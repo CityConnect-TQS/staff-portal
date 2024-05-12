@@ -8,6 +8,7 @@ import "@fontsource-variable/dm-sans";
 import "./index.css";
 import "react-material-symbols/rounded";
 import { NextUIProvider } from "@nextui-org/react";
+import { CookiesProvider } from "react-cookie";
 
 const queryClient = new QueryClient();
 
@@ -26,9 +27,11 @@ if (!rootElement.innerHTML) {
     <StrictMode>
       <NextUIProvider>
         <ThemeProvider>
-          <QueryClientProvider client={queryClient}>
-            <RouterProvider router={router} />
-          </QueryClientProvider>
+          <CookiesProvider>
+            <QueryClientProvider client={queryClient}>
+              <RouterProvider router={router} />
+            </QueryClientProvider>
+          </CookiesProvider>
         </ThemeProvider>
       </NextUIProvider>
     </StrictMode>

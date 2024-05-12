@@ -4,10 +4,11 @@ import { ZonedDateTime, now, getLocalTimeZone } from '@internationalized/date';
 import { TripCreate } from "@/types/trip";
 import { createTrip } from "@/services/tripService";
 import { getBuses } from "@/services/busService";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { getCities } from "@/services/cityService";
 import { City } from "@/types/city";
 import { Bus } from "@/types/bus";
+import { MaterialSymbol } from "react-material-symbols";
 
 export function ModalCreateTrip() {
   const {isOpen, onOpen, onClose} = useDisclosure();
@@ -20,7 +21,9 @@ export function ModalCreateTrip() {
   const { data: buses } = useQuery<Bus[], Error>({
     queryKey: ['buses'], 
     queryFn: () => getBuses().then((data) => data.map((bus) => ({id: bus.id, company: bus.company, capacity: bus.capacity}))),
-   });
+  });
+
+  const queryClient = useQueryClient();
 
 
   const { Field, handleSubmit, state } = useForm<TripCreate>({
@@ -31,9 +34,9 @@ export function ModalCreateTrip() {
       arrival: {id: 0},
       price: 0.00,
       bus: {id: 0},
+      status: "ONTIME",
     },
    onSubmit: async ({ value }) => {
-    console.log(value);
 
     const departureCity = cities?.find(city => city.id == value.departure.id)? cities?.find(city => city.id == value.departure.id) : "";
     const arrivalCity = cities?.find(city => city.id == value.arrival.id)? cities?.find(city => city.id == value.arrival.id) : "";
@@ -44,8 +47,6 @@ export function ModalCreateTrip() {
     if (!departureCity || !arrivalCity || !bus || !departureTime || !arrivalTime) {
       return;
     }
-    console.log(arrivalTime);
-    console.log(departureTime);
     const trip: TripCreate = {
       departure: departureCity,
       departureTime: departureTime,
@@ -53,6 +54,7 @@ export function ModalCreateTrip() {
       arrivalTime: arrivalTime,
       price: value.price,
       bus: bus,
+      status: "ONTIME",
     };
 
     const tripCreated = await createTrip(trip).catch((error) => {
@@ -64,7 +66,7 @@ export function ModalCreateTrip() {
       return;
     }
 
-    console.log(tripCreated);
+    await queryClient.invalidateQueries({queryKey: ['trips']});
 
     onClose();
   },
@@ -79,6 +81,9 @@ export function ModalCreateTrip() {
       if (value.value.departureTime.toString() === value.value.arrivalTime.toString()) {
         return 'The departure date and time must be different from the arrival date and time.';
       }
+      if (value.value.departureTime < new Date() || value.value.arrivalTime < new Date()) {
+        return 'The departure or arrival date and time must be greater than the current date and time.';
+      }
     },
   },
   });
@@ -86,8 +91,8 @@ export function ModalCreateTrip() {
   return (
     <>
       <div className="flex flex-wrap gap-3">
-        <Button color="default" variant="bordered" onClick={onOpen}>
-            Add Trip
+        <Button color="primary" onClick={onOpen} endContent={<MaterialSymbol icon="add" size={20}/>}>
+           Add New
         </Button>
       </div>
       <Modal backdrop={'blur'} isOpen={isOpen} onClose={onClose}>

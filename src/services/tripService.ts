@@ -16,7 +16,7 @@ export const getTrips = async (
   params?: TripSearchParameters
 ): Promise<Trip[]> => {
   const res = await fetch(
-    PUBLIC_BASE_API_URL +
+    BACKOFFICE_BASE_API_URL +
       "trip?" +
       new URLSearchParams(params as Record<string, string>).toString(),
     {
@@ -30,6 +30,7 @@ export const getTrips = async (
     trip.departureTime = new Date(trip.departureTime);
     trip.arrivalTime = new Date(trip.arrivalTime);
   });
+
   return data;
 };
 
@@ -79,12 +80,13 @@ export const updateTrip = async (id: number, trip: TripCreate): Promise<Trip> =>
       "Content-Type": "application/json",
     },
     body: JSON.stringify(trip),
+  
   }).then((res) => res.json() as Promise<Trip>);
 
-export const deleteTrip = async (id: number): Promise<undefined> =>
+export const deleteTrip = async (id: number) =>
   fetch(BACKOFFICE_BASE_API_URL + "trip/" + id, {
     method: "DELETE",
     headers: {
       "Content-Type": "application/json",
     },
-  }).then((res) => res.json() as Promise<undefined>);
+  }).then((res) => res.status === 200);
