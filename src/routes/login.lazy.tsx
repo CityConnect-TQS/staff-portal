@@ -8,20 +8,21 @@ import { useCookies } from "react-cookie";
 import { loginUser } from "@/services/userService.ts";
 import { MaterialSymbol } from "react-material-symbols";
 import { Button, Chip, CircularProgress, Input } from "@nextui-org/react";
+import { useEffect } from "react";
 
 export const Route = createFileRoute("/login")({
   component: Login,
-  validateSearch: (search: Record<string, unknown>) => {
-    return {
-      redirect: search.redirect as string,
-    };
-  },
 });
 
 function Login() {
-  const [, setCookies] = useCookies(["user"]);
-  const { redirect } = Route.useSearch();
+  const [cookies, setCookies] = useCookies(["user"]);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (cookies.user !== undefined) {
+      void navigate({ to: "/" });
+    }
+  }, [cookies.user, navigate]);
 
   const mutation = useMutation({
     mutationFn: loginUser,
@@ -30,7 +31,7 @@ function Login() {
         path: "/",
         expires: new Date(user.expires),
       });
-      void navigate({ to: redirect ?? "/" });
+      void navigate({ to: "/" });
     },
   });
 

@@ -4,13 +4,10 @@ import { createFileRoute, redirect } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/tripDetails")({
   component: TripDetails,
-  beforeLoad: ({ context, location }) => {
+  beforeLoad: ({ context }) => {
     if (!context.user) {
       throw redirect({
         to: "/login",
-        search: {
-          redirect: location.href,
-        },
       });
     }
   },
