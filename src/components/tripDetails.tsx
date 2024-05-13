@@ -6,7 +6,7 @@ import { Autocomplete, AutocompleteItem, Button, DatePicker, Input } from "@next
 import { City } from "@/types/city";
 import { Bus } from "@/types/bus";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { SelectedTripCookies, TripCreate, TripDataTable } from "@/types/trip";
+import { SelectedTripCookies, Trip, TripCreate } from "@/types/trip";
 import { useState } from "react";
 import { useCookies } from "react-cookie";
 import { updateTrip } from "@/services/tripService";
@@ -37,13 +37,14 @@ export function TripDetailsBoard() {
 
   const { Field, handleSubmit, state } = useForm<TripCreate>({
     defaultValues: {
-        departure: {id: cities?.find(city => city.name === selectedTrip.trip.departure)?.id ??  0},
-        departureTime: selectedTrip.trip.departureDate,
-        arrivalTime: selectedTrip.trip.arrivalDate,
-        arrival: {id: cities?.find(city => city.name === selectedTrip.trip.arrival)?.id ?? 0},
-        price: selectedTrip.trip.price,
-        bus: {id: buses?.find(bus => bus.company === selectedTrip.trip.bus)?.id ?? 0},
-    },
+      departure: {id: cities?.find(city => city.name === selectedTrip.trip.departure.name)?.id??  0},
+      departureTime: selectedTrip.trip.departureTime,
+      arrivalTime: selectedTrip.trip.arrivalTime,
+      arrival: {id: cities?.find(city => city.name === selectedTrip.trip.arrival.name)?.id?? 0},
+      price: selectedTrip.trip.price,
+      bus: {id: buses?.find(bus => bus.company === selectedTrip.trip.bus.company)?.id?? 0},
+      status: selectedTrip.trip.status,
+  },
     onSubmit: async ({ value }) => {
       const departureCity = cities?.find(city => city.id == value.departure.id);
       const arrivalCity = cities?.find(city => city.id == value.arrival.id);
@@ -63,8 +64,8 @@ export function TripDetailsBoard() {
         arrivalTime: arrivalTime,
         price: price,
         bus: bus,
+        status: selectedTrip.trip.status, 
       };
-      
       const tripCreated = await updateTrip(selectedTrip.trip.id ,trip).catch((error) => {
          console.error('Error:', error);
          return;
@@ -74,15 +75,14 @@ export function TripDetailsBoard() {
         return;
       }
 
-      const tripUpdated : TripDataTable = {
+      const tripUpdated : Trip = {
         id: tripCreated.id,
-        departure: tripCreated.departure.name,
-        departureDate: new Date(tripCreated.departureTime),
-        arrival: tripCreated.arrival.name,
-        arrivalDate: new Date(tripCreated.arrivalTime),
+        departure: tripCreated.departure,
+        departureTime: new Date(tripCreated.departureTime),
+        arrival: tripCreated.arrival,
+        arrivalTime: new Date(tripCreated.arrivalTime),
         price: tripCreated.price,
-        bus: tripCreated.bus.company,
-        busCapacity: tripCreated.bus.capacity,
+        bus: tripCreated.bus,
         freeSeats: selectedTrip.trip.freeSeats,
         status: selectedTrip.trip.status,
       }
@@ -103,6 +103,9 @@ export function TripDetailsBoard() {
         }
         if (value.value.departureTime.toString() === value.value.arrivalTime.toString()) {
           return 'The departure date and time must be different from the arrival date and time.';
+        }
+        if (value.value.departureTime < new Date() || value.value.arrivalTime < new Date()) {
+          return 'The departure or arrival date and time must be greater than the current date and time.';
         }
       },
     },
@@ -131,6 +134,8 @@ export function TripDetailsBoard() {
       <form>
         <div className="flex flex-col">
         <p className="font-medium text-2xl my-4">Trip Details</p>
+        {state.errors && <span className="text-red-500">{state.errors}</span>}
+
          <div className="flex flex-row justify-center gap-8">
             <Field
                 name="departure"
@@ -147,7 +152,7 @@ export function TripDetailsBoard() {
                       label="Departure City"
                       size="lg"
                       defaultItems={cities}
-                      defaultInputValue= {selectedTrip.trip.departure}
+                      defaultInputValue= {selectedTrip.trip.departure.name}
                       onSelectionChange={(selectedValue) => {
                       const selectedcities = cities?.find(cities => cities.id == selectedValue);
                       if (selectedcities) {
@@ -178,7 +183,7 @@ export function TripDetailsBoard() {
                   label="Arrival cities"
                   size="lg"
                   defaultItems={cities}
-                  defaultInputValue= {selectedTrip.trip.arrival}
+                  defaultInputValue= {selectedTrip.trip.arrival.name}
                   onSelectionChange={(selectedValue) => {
                     const selectedcities = cities?.find(cities => cities.id == selectedValue);
                     if (selectedcities) {
@@ -212,14 +217,14 @@ export function TripDetailsBoard() {
                   isRequired
                   defaultValue={new ZonedDateTime(
                     'era',
-                    new Date(selectedTrip.trip.departureDate).getUTCFullYear(),
-                    new Date(selectedTrip.trip.departureDate).getUTCMonth() + 1,
-                    new Date(selectedTrip.trip.departureDate).getUTCDate(),
+                    new Date(selectedTrip.trip.departureTime).getUTCFullYear(),
+                    new Date(selectedTrip.trip.departureTime).getUTCMonth() + 1,
+                    new Date(selectedTrip.trip.departureTime).getUTCDate(),
                     'Europe/Lisbon',
                     -1, 
-                    new Date(selectedTrip.trip.departureDate).getUTCHours(),
-                    new Date(selectedTrip.trip.departureDate).getUTCMinutes(),
-                    new Date(selectedTrip.trip.departureDate).getUTCSeconds()
+                    new Date(selectedTrip.trip.departureTime).getUTCHours(),
+                    new Date(selectedTrip.trip.departureTime).getUTCMinutes(),
+                    new Date(selectedTrip.trip.departureTime).getUTCSeconds()
                   )}
                   onChange={(value: ZonedDateTime) => {
                     handleChange(value.toDate());
@@ -244,14 +249,14 @@ export function TripDetailsBoard() {
                 isRequired
                 defaultValue={new ZonedDateTime(
                   'era',
-                  new Date(selectedTrip.trip.arrivalDate).getUTCFullYear(),
-                  new Date(selectedTrip.trip.arrivalDate).getUTCMonth() + 1,
-                  new Date(selectedTrip.trip.arrivalDate).getUTCDate(),
+                  new Date(selectedTrip.trip.arrivalTime).getUTCFullYear(),
+                  new Date(selectedTrip.trip.arrivalTime).getUTCMonth() + 1,
+                  new Date(selectedTrip.trip.arrivalTime).getUTCDate(),
                   'Europe/Lisbon',
                   -1, 
-                  new Date(selectedTrip.trip.arrivalDate).getUTCHours(),
-                  new Date(selectedTrip.trip.arrivalDate).getUTCMinutes(),
-                  new Date(selectedTrip.trip.arrivalDate).getUTCSeconds()
+                  new Date(selectedTrip.trip.arrivalTime).getUTCHours(),
+                  new Date(selectedTrip.trip.arrivalTime).getUTCMinutes(),
+                  new Date(selectedTrip.trip.arrivalTime).getUTCSeconds()
                 )}
                 onChange={(value: ZonedDateTime) => {
                   handleChange(value.toDate());
@@ -310,7 +315,7 @@ export function TripDetailsBoard() {
                 label="Bus ID"
                 size="lg"
                 defaultItems={buses}
-                defaultInputValue={`${selectedTrip.trip.bus} - ${selectedTrip.trip.busCapacity} Seats`}
+                defaultInputValue={`${selectedTrip.trip.bus.company} - ${selectedTrip.trip.bus.capacity} Seats`}
                 onSelectionChange={(selectedValue) => {
                   const selectedbuses = buses?.find(buses => buses.id == selectedValue);
                   if (selectedbuses) {
@@ -330,7 +335,6 @@ export function TripDetailsBoard() {
               </Field>
             </div>
           </div>
-          {state.errors && <span className="text-red-500">{state.errors}</span>}
       </form>
       <div className="flex mt-8">
         <p className="font-medium text-2xl my-4">Reservations</p>
