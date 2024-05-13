@@ -3,17 +3,22 @@ import { BACKOFFICE_BASE_API_URL, PUBLIC_BASE_API_URL } from "./config";
 import { CurrencyParams } from "@/types/currency";
 import { Reservation } from "@/types/reservation";
 
-export const createTrip = async (trip: TripCreate): Promise<Trip> =>
+export const createTrip = async (
+  trip: TripCreate,
+  jwt: string,
+): Promise<Trip> =>
   fetch(BACKOFFICE_BASE_API_URL + "trip", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
+      Authorization: "Bearer " + jwt,
     },
     body: JSON.stringify(trip),
   }).then((res) => res.json() as Promise<Trip>);
 
 export const getTrips = async (
-  params?: TripSearchParameters
+  jwt: string,
+  params?: TripSearchParameters,
 ): Promise<Trip[]> => {
   const res = await fetch(
     BACKOFFICE_BASE_API_URL +
@@ -22,10 +27,11 @@ export const getTrips = async (
     {
       headers: {
         "Content-Type": "application/json",
+        Authorization: "Bearer " + jwt,
       },
-    }
+    },
   );
-  const data: Trip[] = await res.json() as Trip[];
+  const data: Trip[] = (await res.json()) as Trip[];
   data.forEach((trip: Trip) => {
     trip.departureTime = new Date(trip.departureTime);
     trip.arrivalTime = new Date(trip.arrivalTime);
@@ -36,7 +42,7 @@ export const getTrips = async (
 
 export const getTrip = async (
   id: number,
-  params?: CurrencyParams
+  params?: CurrencyParams,
 ): Promise<Trip> => {
   const res = await fetch(
     PUBLIC_BASE_API_URL +
@@ -48,9 +54,9 @@ export const getTrip = async (
       headers: {
         "Content-Type": "application/json",
       },
-    }
+    },
   );
-  const data: Trip = await res.json() as Trip;
+  const data: Trip = (await res.json()) as Trip;
   data.departureTime = new Date(data.departureTime);
   data.arrivalTime = new Date(data.arrivalTime);
   return data;
@@ -58,7 +64,8 @@ export const getTrip = async (
 
 export const getTripReservations = async (
   id: number,
-  params?: CurrencyParams
+  jwt: string,
+  params?: CurrencyParams,
 ): Promise<Reservation[]> =>
   fetch(
     BACKOFFICE_BASE_API_URL +
@@ -69,24 +76,30 @@ export const getTripReservations = async (
     {
       headers: {
         "Content-Type": "application/json",
+        Authorization: "Bearer " + jwt,
       },
-    }
+    },
   ).then((res) => res.json() as Promise<Reservation[]>);
 
-export const updateTrip = async (id: number, trip: TripCreate): Promise<Trip> =>
+export const updateTrip = async (
+  id: number,
+  trip: TripCreate,
+  jwt: string,
+): Promise<Trip> =>
   fetch(BACKOFFICE_BASE_API_URL + "trip/" + id, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
+      Authorization: "Bearer " + jwt,
     },
     body: JSON.stringify(trip),
-  
   }).then((res) => res.json() as Promise<Trip>);
 
-export const deleteTrip = async (id: number) =>
+export const deleteTrip = async (id: number, jwt: string) =>
   fetch(BACKOFFICE_BASE_API_URL + "trip/" + id, {
     method: "DELETE",
     headers: {
       "Content-Type": "application/json",
+      Authorization: "Bearer " + jwt,
     },
   }).then((res) => res.status === 200);
