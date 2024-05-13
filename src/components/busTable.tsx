@@ -3,6 +3,7 @@ import { Bus } from "@/types/bus";
 import {Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Pagination, getKeyValue, Button, SortDescriptor} from "@nextui-org/react";
 import {useMemo, useState } from "react";
 import { MaterialSymbol } from "react-material-symbols";
+import { ModalCreateBus } from "./modalCreateBus";
 
 export function BusTable({buses}: {buses: Bus[]}) {
   const [page, setPage] = useState(1);
@@ -68,8 +69,10 @@ export function BusTable({buses}: {buses: Bus[]}) {
           {Object.keys(item).map((columnKey) => (
             columnKey === "company"? 
               <TableCell key={columnKey} align="center">
-                <Button variant="light" endContent  color="primary" size="sm"><MaterialSymbol icon="edit" size={20}/></Button>
+                <div className="flex flex-row">
+                <ModalCreateBus bus={item} edit={true} />
                 <Button variant="light" endContent color="danger" size="sm"><MaterialSymbol icon="delete" size={20}/></Button>
+                </div>
               </TableCell>
               : <TableCell key={columnKey} align="center">{getKeyValue(item, columnKey)}</TableCell>
           ))}
