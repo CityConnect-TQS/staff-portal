@@ -1,24 +1,32 @@
-import { deleteTrip } from "@/services/tripService";
-import { TripDataTable } from "@/types/trip";
+import { deleteBus } from "@/services/busService";
+import { Bus } from "@/types/bus";
 import {Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, useDisclosure, Chip} from "@nextui-org/react";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { MaterialSymbol } from "react-material-symbols";
+import { Alert } from "./tripsTable";
 
-export function ModalDeleteTrip({ trip }: { trip: TripDataTable }) {
+export function ModalDeleteBus({ bus }: { bus: Bus }) {
   const {isOpen, onOpen, onOpenChange} = useDisclosure();
 
   const queryClient = useQueryClient();
 
-  const alerts = queryClient.getQueryData<{message: string, type: "success" | "warning" , active: boolean}>(['alerts']);
+  const {data: alerts} = useQuery<Alert, Error>({ 
+    queryKey: ['alerts']
+  });
 
   const handleDelete = () => {
 
-    deleteTrip(trip.id).then(async () => {
-        queryClient.setQueryData(['alerts'], {message: "Trip deleted successfully", type: "success", active: true});
-        await queryClient.invalidateQueries({queryKey: ['trips']});
-        onOpenChange();
+    deleteBus(bus.id).then(async (res) => {
+        if (res) {
+            queryClient.setQueryData(['alerts'], {message: "Bus deleted successfully", type: "success", active: true});
+            await queryClient.invalidateQueries({queryKey: ['buses']});
+            onOpenChange();
+        } else {
+            queryClient.setQueryData(['alerts'], {message: "An error occurred while deleting the bus. It's currently in use on a trip.", type: "warning", active: true});
+        }
+    
     }).catch(err => {
-        queryClient.setQueryData(['alerts'], {message: "An error occurred while deleting the trip", type: "warning", active: true});
+        queryClient.setQueryData(['alerts'], {message: "An error occurred while deleting the bus", type: "warning", active: true});
         console.error(err);
     });
 
@@ -30,7 +38,8 @@ export function ModalDeleteTrip({ trip }: { trip: TripDataTable }) {
 
   return (
     <>
-      <MaterialSymbol icon="delete" size={20} color="danger" variant="light" onClick={onOpen} />
+        <Button  endContent onClick={onOpen} color="danger" variant="light"><MaterialSymbol icon="delete" size={20}/></Button>
+      
       <Modal 
         backdrop="opaque" 
         isOpen={isOpen} 
@@ -42,15 +51,15 @@ export function ModalDeleteTrip({ trip }: { trip: TripDataTable }) {
         <ModalContent>
           {(onClose) => (
             <>
-              <ModalHeader className="flex flex-col gap-1">Delete Trip {trip.departure} - {trip.arrival}</ModalHeader>
+              <ModalHeader className="flex flex-col gap-1">Delete Bus {bus.id} - {bus.company}</ModalHeader>
               {alerts?.active && ( 
-                <Chip color={alerts.type} variant="flat" radius="sm">
+                <Chip color={alerts.type} variant="flat" radius="sm" size="sm" className="mx-4">
                     {alerts.message}
                 </Chip>
               )}
               <ModalBody>
                 <p> 
-                    Are you sure you want to delete the trip from {trip.departure} on {trip.departureDate.toLocaleString("en-US", { day: "numeric", month: "long", year: "numeric", hour: "numeric", minute: "numeric"})} to {trip.arrival} on {trip.arrivalDate.toLocaleString("en-US", { day: "numeric", month: "long", year: "numeric", hour: "numeric", minute: "numeric"})}?
+                    Are you sure you want to delete the bus {bus.id} on {bus.company}?
                 </p>
 
               </ModalBody>

@@ -10,13 +10,14 @@ export function ModalCreateBus({ company, edit, bus }: {company?: string, edit: 
 
   const queryClient = useQueryClient();
 
-
   const { Field, handleSubmit } = useForm<BusCreate>({
     defaultValues: {
-      company: edit? (bus?.company?? "") : (company? company : ""),
-      capacity: edit? (bus?.capacity?? 0) : 0,
+      company: edit ? (bus?.company?? "") : (company? company : ""),
+      capacity: edit ? (bus?.capacity?? 0) : 0,
     },
    onSubmit: async ({ value }) => {
+
+    console.log("value", value);
 
     const busNew: BusCreate = {
         company: value.company,

@@ -33,10 +33,10 @@ export const updateBus = async (id: number, bus: BusCreate): Promise<Bus> =>
     body: JSON.stringify(bus),
   }).then((res) => res.json() as Promise<Bus>);
 
-export const deleteBus = async (id: number): Promise<undefined> =>
+export const deleteBus = async (id: number) =>
   fetch(BACKOFFICE_BASE_API_URL + "bus/" + id, {
     method: "DELETE",
     headers: {
       "Content-Type": "application/json",
     },
-  }).then((res) => res.json() as Promise<undefined>);
+  }).then((res) => res.status === 200);

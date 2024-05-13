@@ -1,8 +1,8 @@
 
 import { Bus } from "@/types/bus";
-import {Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Pagination, getKeyValue, Button, SortDescriptor} from "@nextui-org/react";
+import {Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Pagination, getKeyValue, SortDescriptor} from "@nextui-org/react";
 import {useMemo, useState } from "react";
-import { MaterialSymbol } from "react-material-symbols";
+import { ModalDeleteBus } from "./modalDeleteBus";
 import { ModalCreateBus } from "./modalCreateBus";
 
 export function BusTable({buses}: {buses: Bus[]}) {
@@ -71,7 +71,7 @@ export function BusTable({buses}: {buses: Bus[]}) {
               <TableCell key={columnKey} align="center">
                 <div className="flex flex-row">
                 <ModalCreateBus bus={item} edit={true} />
-                <Button variant="light" endContent color="danger" size="sm"><MaterialSymbol icon="delete" size={20}/></Button>
+                <ModalDeleteBus bus={item}/>
                 </div>
               </TableCell>
               : <TableCell key={columnKey} align="center">{getKeyValue(item, columnKey)}</TableCell>
