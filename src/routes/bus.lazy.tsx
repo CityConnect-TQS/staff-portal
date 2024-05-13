@@ -5,6 +5,8 @@ import { getBuses } from '@/services/busService'
 import { Bus } from '@/types/bus'
 import { useQuery } from '@tanstack/react-query'
 import { createLazyFileRoute } from '@tanstack/react-router'
+import { useQueryClient } from '@tanstack/react-query'
+import { Chip } from '@nextui-org/react'
 
 export const Route = createLazyFileRoute('/bus')({
   component: Buses,
@@ -20,6 +22,9 @@ function Buses() {
         queryKey: ["buses"],
         queryFn: getBuses,
     });
+
+    const queryClient = useQueryClient();
+    const alerts = queryClient.getQueryData<{message: string, type: "success" | "warning" , active: boolean}>(['alerts']);
 
     const busGroups: BusGroups[] = (buses?? []).reduce((acc: BusGroups[], bus: Bus) => {
         const existingGroup = acc.find(group => group.company === bus.company);
@@ -42,6 +47,11 @@ function Buses() {
         <div className='flex mx-8 justify-end'>
             <ModalCreateBus company="" />
         </div>
+        {alerts?.active && ( 
+            <Chip color={alerts.type} variant="flat" radius="sm">
+                {alerts.message}
+            </Chip>
+        )}
         <div className='grid grid-cols-4 gap-16 mx-8'>
             {busGroups?.map((group, index) => (
                 <div key={index}>

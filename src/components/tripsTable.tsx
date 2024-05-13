@@ -34,6 +34,11 @@ const statusColorMap: Record<string, ChipProps["color"]> = {
   completed: "danger",
 };
 
+export interface Alert {
+  message: string;
+  type: "success" | "warning" ; 
+  active: boolean;  
+}
 
 const INITIAL_VISIBLE_COLUMNS = ["departure" ,"arrival", "price" ,"status", "actions"];
 
@@ -349,11 +354,7 @@ export function TripsTable() {
     );
   }, [page, pages, onPreviousPage, onNextPage]);
 
-  interface Alert {
-    message: string;
-    type: "success" | "warning" ; 
-    active: boolean;  
-  }
+
 
   const { data: alerts } = useQuery<Alert, Error>({
    queryKey: ['alerts']
