@@ -38,7 +38,8 @@ export function ModalDeleteBus({ bus }: { bus: Bus }) {
 
   return (
     <>
-      <MaterialSymbol icon="delete" size={20} color="danger" variant="light" onClick={onOpen} />
+        <Button  endContent onClick={onOpen} color="danger" variant="light"><MaterialSymbol icon="delete" size={20}/></Button>
+      
       <Modal 
         backdrop="opaque" 
         isOpen={isOpen} 
