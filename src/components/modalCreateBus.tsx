@@ -2,10 +2,10 @@ import {Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, useDis
 import { useForm } from '@tanstack/react-form'
 import { MaterialSymbol } from "react-material-symbols";
 import { useQueryClient } from "@tanstack/react-query";
-import { BusCreate } from "@/types/bus";
-import { createBus } from "@/services/busService";
+import { Bus, BusCreate } from "@/types/bus";
+import { createBus, updateBus } from "@/services/busService";
 
-export function ModalCreateBus({company}: {company: string}) {
+export function ModalCreateBus({ company, edit, bus }: {company?: string, edit: boolean, bus?: Bus}) {
   const {isOpen, onOpen, onClose} = useDisclosure();
 
   const queryClient = useQueryClient();
@@ -13,17 +13,28 @@ export function ModalCreateBus({company}: {company: string}) {
 
   const { Field, handleSubmit } = useForm<BusCreate>({
     defaultValues: {
-        company: company,
-        capacity: 0,
+      company: edit? (bus?.company?? "") : (company? company : ""),
+      capacity: edit? (bus?.capacity?? 0) : 0,
     },
    onSubmit: async ({ value }) => {
 
-    const bus: BusCreate = {
+    const busNew: BusCreate = {
         company: value.company,
         capacity: value.capacity,
     };
 
-    const busCreated = await createBus(bus).catch((error) => {
+    if (edit && bus) {
+      const busUpdated = await updateBus(bus.id, busNew).catch((error) => {
+        console.error('Error:', error);
+        return;
+      })
+
+      if (!busUpdated) {
+        return;
+      }
+
+    } else {
+      const busCreated = await createBus(busNew).catch((error) => {
         console.error('Error:', error);
         return;
       });
@@ -31,6 +42,8 @@ export function ModalCreateBus({company}: {company: string}) {
      if (!busCreated) {
        return;
      }
+
+    }
  
      await queryClient.invalidateQueries({queryKey: ['buses']});
  
@@ -52,15 +65,18 @@ export function ModalCreateBus({company}: {company: string}) {
   return (
     <>
       <div className="flex flex-wrap gap-3">
-        <Button color="primary" variant={company? "flat" : "solid"} onClick={onOpen} size="sm" endContent={<MaterialSymbol icon="add" size={20}/>}>
-            {company? "" : "Add New"}
-        </Button>
+        {edit ? <Button variant="light" endContent onClick={onOpen} color="primary" size="sm"><MaterialSymbol icon="edit" size={20}/></Button> : 
+            <Button color="primary" variant={company? "flat" : "solid"} onClick={onOpen} size="sm" endContent={<MaterialSymbol icon="add" size={20}/>}>
+              {company? "" : "Add New"}
+            </Button>
+        }
+
       </div>
       <Modal backdrop={'blur'} isOpen={isOpen} onClose={onClose}>
         <ModalContent>
           {(onClose) => (
             <>
-              <ModalHeader className="flex flex-col gap-1">Create Trip</ModalHeader>
+              <ModalHeader className="flex flex-col gap-1">{edit ? "Edit Trip" : "Create Trip" }</ModalHeader>
               <ModalBody>
               <form className="flex flex-col gap-4">
                 <Field

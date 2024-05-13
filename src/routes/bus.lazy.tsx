@@ -45,7 +45,7 @@ function Buses() {
         <div className="flex flex-col gap-16 p-2">
         <NavbarStaff />
         <div className='flex mx-8 justify-end'>
-            <ModalCreateBus company="" />
+            <ModalCreateBus company="" edit={false} />
         </div>
         {alerts?.active && ( 
             <Chip color={alerts.type} variant="flat" radius="sm">
@@ -57,7 +57,7 @@ function Buses() {
                 <div key={index}>
                     <div className='flex flex-row justify-between'>
                         <h2 className='text-xl font-medium mb-4'>{group.company}</h2>
-                        <ModalCreateBus company={group.company} />
+                        <ModalCreateBus company={group.company} edit={false} />
                     </div>
                     <BusTable buses={group.buses} />
                 </div>
