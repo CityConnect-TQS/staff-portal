@@ -11,6 +11,7 @@ export interface Trip {
   arrivalTime: Date;
   price: number;
   freeSeats: number;
+  status: string;
 }
 
 export type TripCreate = Omit<Trip, "id" | "bus" | "departure" | "arrival" | "departureTime" | "arrivalTime" | "price" | "freeSeats"> & {
@@ -31,20 +32,7 @@ export type TripSearchParameters = CurrencyParams & {
   seats?: number;
 };
 
-export type TripDataTable = &{
-  id: number;
-  departure: string;
-  arrival: string;
-  departureDate: Date;
-  arrivalDate: Date;
-  price: number;
-  freeSeats: number;
-  bus: string;
-  busCapacity: number;
-  status: string;
-}
-
 export type SelectedTripCookies = & {
-  trip: TripDataTable;
+  trip: Trip;
   edit: boolean
 }

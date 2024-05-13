@@ -1,5 +1,5 @@
 import { getTrips } from "@/services/tripService";
-import { Trip, TripDataTable } from "@/types/trip";
+import { Trip } from "@/types/trip";
 import {
   Table,
   TableHeader,
@@ -29,9 +29,9 @@ import { useNavigate} from "@tanstack/react-router";
 import { useCookies } from "react-cookie";
 
 const statusColorMap: Record<string, ChipProps["color"]> = {
-  active: "success",
-  full: "warning",
-  completed: "danger",
+  ontime: "success",
+  delayed: "warning",
+  departed: "danger",
 };
 
 
@@ -40,9 +40,9 @@ const INITIAL_VISIBLE_COLUMNS = ["departure" ,"arrival", "price" ,"status", "act
 const columns = [
   {name: "ID", uid: "id", sortable: true},
   {name: "DEPARTURE", uid: "departure", sortable: true},
-  {name: "DEPARTURE DATE", uid: "departureDate", sortable: true},
+  {name: "DEPARTURE DATE", uid: "departureTime", sortable: true},
   {name: "ARRIVAL", uid: "arrival", sortable: true},
-  {name: "ARRIVAL DATE", uid: "arrivalDate", sortable: true},
+  {name: "ARRIVAL DATE", uid: "arrivalTime", sortable: true},
   {name: "BUS COMPANY", uid: "bus"},
   {name: "PRICE", uid: "price", sortable: true},
   {name: "STATUS", uid: "status", sortable: true},
@@ -50,9 +50,9 @@ const columns = [
 ];
 
 const statusOptions = [
-  {name: "Active", uid: "active"},
-  {name: "Full", uid: "full"},
-  {name: "Completed", uid: "completed"},
+  {name: "OnTime", uid: "ontime"},
+  {name: "Delayed", uid: "delayed"},
+  {name: "Departed", uid: "departed"},
 ];
 
 
@@ -67,32 +67,17 @@ export function TripsTable() {
   const [statusFilter, setStatusFilter] = useState<Selection>("all");
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [sortDescriptor, setSortDescriptor] = useState<SortDescriptor>({
-    column: "departureDate",
+    column: "departureTime",
     direction: "ascending",
   });
 
   const navigate = useNavigate();
 
-  const {data: trips} = useQuery<Trip[], Error>({
+  const {data: trips, isLoading} = useQuery<Trip[], Error>({
    queryKey: ['trips'], 
    queryFn: () => getTrips().then((data) => data.map((trip) => ({...trip, departureTime: new Date(trip.departureTime), arrivalTime: new Date(trip.arrivalTime)}))),
   });
 
-
-  const tripsData = useMemo(() => {
-   return trips?.map((trip) => ({
-      id: trip.id,
-      departure: trip.departure.name,
-      arrival: trip.arrival.name,
-      departureDate: trip.departureTime,
-      arrivalDate: trip.arrivalTime,
-      price: trip.price,
-      freeSeats: trip.freeSeats,
-      bus: trip.bus.company,
-      busCapacity: trip.bus.capacity,
-      status: trip.departureTime > new Date() && trip.freeSeats > 0 ? "Active" : trip.departureTime > new Date() && trip.freeSeats <= 0 ? "Full" : "Completed",
-   })) ?? [];
-  }, [trips]);
 
   const [page, setPage] = useState(1);
 
@@ -105,12 +90,14 @@ export function TripsTable() {
   }, [visibleColumns]);
 
   const filteredItems = useMemo(() => {
-    let filteredTrips = [...tripsData];
+    if (!trips) return [];
+
+    let filteredTrips = [...trips];
 
     if (hasSearchFilter) {
       filteredTrips = filteredTrips.filter((trip) =>
-        trip.departure.toLowerCase().includes(filterValue.toLowerCase()) ||
-        trip.arrival.toLowerCase().includes(filterValue.toLowerCase()),
+        trip.departure.name.toLowerCase().includes(filterValue.toLowerCase()) ||
+        trip.arrival.name.toLowerCase().includes(filterValue.toLowerCase()),
       );
     }
     if (statusFilter !== "all" && Array.from(statusFilter).length !== statusOptions.length) {
@@ -120,7 +107,7 @@ export function TripsTable() {
     }
 
     return filteredTrips;
-  }, [tripsData, hasSearchFilter, statusFilter, filterValue]);
+  }, [trips, hasSearchFilter, statusFilter, filterValue]);
 
   const pages = Math.ceil(filteredItems.length / rowsPerPage);
 
@@ -132,9 +119,23 @@ export function TripsTable() {
   }, [page, filteredItems, rowsPerPage]);
 
   const sortedItems = useMemo(() => {
-    return [...items].sort((a: TripDataTable, b: TripDataTable) => {
-      const first = a[sortDescriptor.column as keyof TripDataTable] as number;
-      const second = b[sortDescriptor.column as keyof TripDataTable] as number;
+    return [...items].sort((a: Trip, b: Trip) => {
+
+      const first = a[sortDescriptor.column as keyof Trip];
+      const second = b[sortDescriptor.column as keyof Trip];
+
+      if (first instanceof Date && second instanceof Date) {
+        return sortDescriptor.direction === "descending" ? second.getTime() - first.getTime() : first.getTime() - second.getTime();
+      } else if (first instanceof Object && second instanceof Object) {
+        if ('name' in first && 'name' in second) {
+          const cmp = first.name < second.name ? -1 : first.name > second.name ? 1 : 0;
+          return sortDescriptor.direction === "descending" ? -cmp : cmp;
+        } else if ('company' in first && 'company' in second) {
+          const cmp = first.company < second.company ? -1 : first.company > second.company ? 1 : 0;
+          return sortDescriptor.direction === "descending" ? -cmp : cmp;
+        }
+      }
+
       const cmp = first < second ? -1 : first > second ? 1 : 0;
 
       return sortDescriptor.direction === "descending" ? -cmp : cmp;
@@ -143,29 +144,29 @@ export function TripsTable() {
 
   const [, setCookies] = useCookies(["selectedTrip"]);
 
-  const handleSelectTrip = useCallback((trip: TripDataTable, edit: boolean) => () => {
+  const handleSelectTrip = useCallback((trip: Trip, edit: boolean) => () => {
     const tripData = JSON.stringify({ trip: trip, edit: edit });
     setCookies("selectedTrip", tripData);
     void navigate({ to: "/tripDetails" });
 
   }, [navigate, setCookies]);
 
-  const renderCell = useCallback((trip: TripDataTable, columnKey: Key) => {
-    const cellValue = trip[columnKey as keyof TripDataTable];
+  const renderCell = useCallback((trip: Trip, columnKey: Key) => {
+    const cellValue = trip[columnKey as keyof Trip];
 
     switch (columnKey) {
       case "departure":
         return (
             <div className="flex flex-col">
-            <p className="text-bold text-small capitalize">{trip.departure}</p>
-            <p className="text-bold text-tiny capitalize text-default-400">{trip.departureDate.toLocaleString("en-US", { day: "numeric", month: "long", year: "numeric", hour: "numeric", minute: "numeric"})}</p>
+            <p className="text-bold text-small capitalize">{trip.departure.name}</p>
+            <p className="text-bold text-tiny capitalize text-default-400">{trip.departureTime.toLocaleString("en-US", { day: "numeric", month: "long", year: "numeric", hour: "numeric", minute: "numeric"})}</p>
           </div>
         );
       case "arrival":
         return (
           <div className="flex flex-col">
-            <p className="text-bold text-small capitalize">{trip.arrival}</p>
-            <p className="text-bold text-tiny capitalize text-default-400">{trip.arrivalDate.toLocaleString("en-US", {day: "numeric", month: "long", year: "numeric", hour: "numeric", minute: "numeric"})}</p>
+            <p className="text-bold text-small capitalize">{trip.arrival.name}</p>
+            <p className="text-bold text-tiny capitalize text-default-400">{trip.arrivalTime.toLocaleString("en-US", {day: "numeric", month: "long", year: "numeric", hour: "numeric", minute: "numeric"})}</p>
           </div>
         );
       case "price":
@@ -211,7 +212,13 @@ export function TripsTable() {
             minute: "numeric",
             });
           }
-          return cellValue;
+        if (cellValue instanceof Object) {
+          if ('name' in cellValue) {
+            return cellValue.name; 
+          } else if ('company' in cellValue) {
+            return cellValue.company; 
+          }
+        }
     }
   }, [handleSelectTrip]);
 
@@ -306,7 +313,7 @@ export function TripsTable() {
           </div>
         </div>
         <div className="flex justify-between items-center">
-          <span className="text-default-400 text-small">Total {tripsData.length} Trips</span>
+          <span className="text-default-400 text-small">Total {trips?.length} Trips</span>
           <label className="flex items-center text-default-400 text-small">
             Rows per page:
             <select
@@ -321,7 +328,7 @@ export function TripsTable() {
         </div>
       </div>
     );
-  }, [filterValue, onSearchChange, statusFilter, visibleColumns, tripsData.length, onRowsPerPageChange, onClear]);
+  }, [filterValue, onSearchChange, statusFilter, visibleColumns, trips?.length, onRowsPerPageChange, onClear]);
 
   const bottomContent = useMemo(() => {
     return (
@@ -356,6 +363,8 @@ export function TripsTable() {
   const { data: alerts } = useQuery<Alert, Error>({
    queryKey: ['alerts']
   });
+
+  if (isLoading) return <p>Loading...</p>;
 
   return (
     <div className="flex flex-col gap-4">

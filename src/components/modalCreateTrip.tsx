@@ -34,6 +34,7 @@ export function ModalCreateTrip() {
       arrival: {id: 0},
       price: 0.00,
       bus: {id: 0},
+      status: "ONTIME",
     },
    onSubmit: async ({ value }) => {
 
@@ -53,6 +54,7 @@ export function ModalCreateTrip() {
       arrivalTime: arrivalTime,
       price: value.price,
       bus: bus,
+      status: "ONTIME",
     };
 
     const tripCreated = await createTrip(trip).catch((error) => {
@@ -78,6 +80,9 @@ export function ModalCreateTrip() {
       }
       if (value.value.departureTime.toString() === value.value.arrivalTime.toString()) {
         return 'The departure date and time must be different from the arrival date and time.';
+      }
+      if (value.value.departureTime < new Date() || value.value.arrivalTime < new Date()) {
+        return 'The departure or arrival date and time must be greater than the current date and time.';
       }
     },
   },
