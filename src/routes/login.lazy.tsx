@@ -73,6 +73,7 @@ function Login() {
                 onChange={(e) => handleChange(e.target.value)}
                 endContent={<MaterialSymbol icon="email" size={20} />}
                 label="Email"
+                id={"email"}
                 onBlur={handleBlur}
                 placeholder="Enter your email"
                 isInvalid={state.meta.errors.length > 0}
@@ -94,6 +95,7 @@ function Login() {
                 onChange={(e) => handleChange(e.target.value)}
                 endContent={<MaterialSymbol icon="password" size={20} />}
                 label="Password"
+                id={"password"}
                 onBlur={handleBlur}
                 placeholder="Enter your password"
                 type="password"
@@ -108,6 +110,7 @@ function Login() {
                 color={isSubmitting ? "default" : "primary"}
                 variant={isSubmitting ? "flat" : "solid"}
                 isDisabled={!canSubmit}
+                id={"loginBtn"}
                 onPress={() => {
                   handleSubmit().catch(() => {
                     console.log("Error", "Failed to log in");
@@ -131,6 +134,7 @@ function Login() {
             <Chip
               color="danger"
               variant={"flat"}
+              id={"loginError"}
               startContent={<MaterialSymbol icon="error" size={20} />}
               className={"mt-4"}
             >
