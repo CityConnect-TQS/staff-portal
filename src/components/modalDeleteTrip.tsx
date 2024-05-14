@@ -3,15 +3,19 @@ import { Trip } from "@/types/trip";
 import {Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, useDisclosure} from "@nextui-org/react";
 import { useQueryClient } from "@tanstack/react-query";
 import { MaterialSymbol } from "react-material-symbols";
+import {User} from "@/types/user.ts";
+import {useCookies} from "react-cookie";
 
 export function ModalDeleteTrip({ trip }: { trip: Trip }) {
   const {isOpen, onOpen, onOpenChange} = useDisclosure();
+  const [cookies] = useCookies(["user"]);
+  const user = cookies.user as User;
 
   const queryClient = useQueryClient();
 
   const handleDelete = () => {
 
-    deleteTrip(trip.id).then(async () => {
+    deleteTrip(trip.id, user.token).then(async () => {
         queryClient.setQueryData(['alerts'], {message: "Trip deleted successfully", type: "success", active: true});
         await queryClient.invalidateQueries({queryKey: ['trips']});
         onOpenChange();
