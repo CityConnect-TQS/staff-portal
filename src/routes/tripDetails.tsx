@@ -1,14 +1,13 @@
 import { NavbarStaff } from "@/components/navbar";
 import { TripDetailsBoard } from "@/components/tripDetails";
-import { createFileRoute, redirect } from "@tanstack/react-router";
+import { createFileRoute, Navigate } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/tripDetails")({
   component: TripDetails,
+  errorComponent: () => <Navigate search={{}} to={"/login"} />,
   beforeLoad: ({ context }) => {
     if (!context.user) {
-      throw redirect({
-        to: "/login",
-      });
+      throw new Error("User not logged in");
     }
   },
 });
