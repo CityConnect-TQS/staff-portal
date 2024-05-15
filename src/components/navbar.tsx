@@ -81,6 +81,7 @@ export function NavbarStaff() {
               <Avatar
                 as="button"
                 className="transition-transform"
+                id="avatarBtn"
                 color={user ? "primary" : "default"}
                 fallback={
                   user ? (
@@ -98,13 +99,18 @@ export function NavbarStaff() {
             <DropdownMenu aria-label="Profile Actions" variant="flat">
               <DropdownSection showDivider>
                 {user ? (
-                  <DropdownItem key="profile" className="h-14 gap-2">
+                  <DropdownItem
+                    key="profile"
+                    className="h-14 gap-2"
+                    id={"userText"}
+                  >
                     <p>Signed in as</p>
                     <p className="font-semibold">{user.name}</p>
                   </DropdownItem>
                 ) : (
                   <DropdownItem
                     key="login"
+                    id={"loginBtn"}
                     onClick={() => void navigate({ to: "/login" })}
                     startContent={<MaterialSymbol icon="login" size={20} />}
                   >
@@ -115,6 +121,7 @@ export function NavbarStaff() {
                   <DropdownItem
                     key="logout"
                     color="danger"
+                    id={"logoutBtn"}
                     startContent={<MaterialSymbol icon="logout" size={20} />}
                     onClick={() => {
                       removeCookies("user");
@@ -126,6 +133,7 @@ export function NavbarStaff() {
                 ) : (
                   <DropdownItem
                     key="register"
+                    id={"signUpBtn"}
                     startContent={
                       <MaterialSymbol icon="app_registration" size={20} />
                     }
