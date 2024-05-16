@@ -1,9 +1,15 @@
 import { NavbarStaff } from "@/components/navbar";
 import { TripsTable } from "@/components/tripsTable";
-import { createLazyFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Navigate } from "@tanstack/react-router";
 
-export const Route = createLazyFileRoute("/")({
+export const Route = createFileRoute("/")({
   component: Index,
+  errorComponent: () => <Navigate search={{}} to={"/login"} />,
+  beforeLoad: ({ context }) => {
+    if (!context.user) {
+      throw new Error("User not logged in");
+    }
+  },
 });
 
 function Index() {

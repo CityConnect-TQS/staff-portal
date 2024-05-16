@@ -1,11 +1,15 @@
 import { deleteTrip } from "@/services/tripService";
-import { TripDataTable } from "@/types/trip";
+import { Trip } from "@/types/trip";
 import {Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, useDisclosure, Chip} from "@nextui-org/react";
 import { useQueryClient } from "@tanstack/react-query";
 import { MaterialSymbol } from "react-material-symbols";
+import {User} from "@/types/user.ts";
+import {useCookies} from "react-cookie";
 
-export function ModalDeleteTrip({ trip }: { trip: TripDataTable }) {
+export function ModalDeleteTrip({ trip }: { trip: Trip }) {
   const {isOpen, onOpen, onOpenChange} = useDisclosure();
+  const [cookies] = useCookies(["user"]);
+  const user = cookies.user as User;
 
   const queryClient = useQueryClient();
 
@@ -13,7 +17,7 @@ export function ModalDeleteTrip({ trip }: { trip: TripDataTable }) {
 
   const handleDelete = () => {
 
-    deleteTrip(trip.id).then(async () => {
+    deleteTrip(trip.id, user.token).then(async () => {
         queryClient.setQueryData(['alerts'], {message: "Trip deleted successfully", type: "success", active: true});
         await queryClient.invalidateQueries({queryKey: ['trips']});
         onOpenChange();
@@ -50,7 +54,7 @@ export function ModalDeleteTrip({ trip }: { trip: TripDataTable }) {
               )}
               <ModalBody>
                 <p> 
-                    Are you sure you want to delete the trip from {trip.departure} on {trip.departureDate.toLocaleString("en-US", { day: "numeric", month: "long", year: "numeric", hour: "numeric", minute: "numeric"})} to {trip.arrival} on {trip.arrivalDate.toLocaleString("en-US", { day: "numeric", month: "long", year: "numeric", hour: "numeric", minute: "numeric"})}?
+                    Are you sure you want to delete the trip from {trip.departure.name} on {trip.departureTime.toLocaleString("en-US", { day: "numeric", month: "long", year: "numeric", hour: "numeric", minute: "numeric"})} to {trip.arrival.name} on {trip.arrivalTime.toLocaleString("en-US", { day: "numeric", month: "long", year: "numeric", hour: "numeric", minute: "numeric"})}?
                 </p>
 
               </ModalBody>

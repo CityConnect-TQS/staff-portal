@@ -13,44 +13,60 @@ import { createFileRoute } from '@tanstack/react-router'
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
+import { Route as TripDetailsImport } from './routes/tripDetails'
+import { Route as IndexImport } from './routes/index'
 
 // Create Virtual Routes
 
-const TripDetailsLazyImport = createFileRoute('/tripDetails')()
+const LoginLazyImport = createFileRoute('/login')()
 const BusLazyImport = createFileRoute('/bus')()
-const IndexLazyImport = createFileRoute('/')()
+const TripDetailsLazyImport = createFileRoute('/tripDetails')()
 
 // Create/Update Routes
 
-const TripDetailsLazyRoute = TripDetailsLazyImport.update({
-  path: '/tripDetails',
+const LoginLazyRoute = LoginLazyImport.update({
+  path: '/login',
   getParentRoute: () => rootRoute,
-} as any).lazy(() => import('./routes/tripDetails.lazy').then((d) => d.Route))
+} as any).lazy(() => import('./routes/login.lazy').then((d) => d.Route))
 
 const BusLazyRoute = BusLazyImport.update({
   path: '/bus',
   getParentRoute: () => rootRoute,
 } as any).lazy(() => import('./routes/bus.lazy').then((d) => d.Route))
 
+const TripDetailsLazyRoute = TripDetailsLazyImport.update({
+  path: '/tripDetails',
+  getParentRoute: () => rootRoute,
+} as any).lazy(() => import('./routes/tripDetails.lazy').then((d) => d.Route))
+
+const AboutLazyRoute = AboutLazyImport.update({
+  path: '/about',
+  getParentRoute: () => rootRoute,
+} as any).lazy(() => import('./routes/about.lazy').then((d) => d.Route))
+
 const IndexLazyRoute = IndexLazyImport.update({
   path: '/',
   getParentRoute: () => rootRoute,
-} as any).lazy(() => import('./routes/index.lazy').then((d) => d.Route))
+} as any)
 
 // Populate the FileRoutesByPath interface
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
     '/': {
-      preLoaderRoute: typeof IndexLazyImport
+      preLoaderRoute: typeof IndexImport
+      parentRoute: typeof rootRoute
+    }
+    '/tripDetails': {
+      preLoaderRoute: typeof TripDetailsLazyImport
       parentRoute: typeof rootRoute
     }
     '/bus': {
       preLoaderRoute: typeof BusLazyImport
       parentRoute: typeof rootRoute
     }
-    '/tripDetails': {
-      preLoaderRoute: typeof TripDetailsLazyImport
+    '/login': {
+      preLoaderRoute: typeof LoginLazyImport
       parentRoute: typeof rootRoute
     }
   }
@@ -59,9 +75,10 @@ declare module '@tanstack/react-router' {
 // Create and export the route tree
 
 export const routeTree = rootRoute.addChildren([
-  IndexLazyRoute,
-  BusLazyRoute,
+  IndexRoute,
   TripDetailsLazyRoute,
+  BusLazyRoute,
+  LoginLazyRoute,
 ])
 
 /* prettier-ignore-end */

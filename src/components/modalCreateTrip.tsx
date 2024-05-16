@@ -9,17 +9,21 @@ import { getCities } from "@/services/cityService";
 import { City } from "@/types/city";
 import { Bus } from "@/types/bus";
 import { MaterialSymbol } from "react-material-symbols";
+import {User} from "@/types/user.ts";
+import {useCookies} from "react-cookie";
 
 export function ModalCreateTrip() {
   const {isOpen, onOpen, onClose} = useDisclosure();
+  const [cookies] = useCookies(["user"]);
+  const user = cookies.user as User;
 
   const { data: cities } = useQuery<City[], Error>({
-    queryKey: ['cities'], 
+    queryKey: ['cities'],
     queryFn: () => getCities().then((data) => data.map((city) => ({id: city.id, name: city.name}))),
    });
-  
+
   const { data: buses } = useQuery<Bus[], Error>({
-    queryKey: ['buses'], 
+    queryKey: ['buses'],
     queryFn: () => getBuses().then((data) => data.map((bus) => ({id: bus.id, company: bus.company, capacity: bus.capacity}))),
   });
 
@@ -34,6 +38,7 @@ export function ModalCreateTrip() {
       arrival: {id: 0},
       price: 0.00,
       bus: {id: 0},
+      status: "ONTIME",
     },
    onSubmit: async ({ value }) => {
 
@@ -53,9 +58,10 @@ export function ModalCreateTrip() {
       arrivalTime: arrivalTime,
       price: value.price,
       bus: bus,
+      status: "ONTIME",
     };
 
-    const tripCreated = await createTrip(trip).catch((error) => {
+    const tripCreated = await createTrip(trip, user.token).catch((error) => {
        console.error('Error:', error);
        return;
      });
@@ -78,6 +84,9 @@ export function ModalCreateTrip() {
       }
       if (value.value.departureTime.toString() === value.value.arrivalTime.toString()) {
         return 'The departure date and time must be different from the arrival date and time.';
+      }
+      if (value.value.departureTime < new Date() || value.value.arrivalTime < new Date()) {
+        return 'The departure or arrival date and time must be greater than the current date and time.';
       }
     },
   },
@@ -143,7 +152,7 @@ export function ModalCreateTrip() {
                         state.value instanceof Date ? state.value.getUTCMonth() : 0,
                         state.value instanceof Date ? state.value.getUTCDay() : 0,
                         'Europe/Lisbon',
-                        -1, 
+                        -1,
                         state.value instanceof Date ? state.value.getUTCHours() : 0,
                         state.value instanceof Date ? state.value.getUTCMinutes() : 0,
                         state.value instanceof Date ? state.value.getUTCSeconds() : 0
@@ -202,7 +211,7 @@ export function ModalCreateTrip() {
                       state.value instanceof Date ? state.value.getUTCMonth() : 0,
                       state.value instanceof Date ? state.value.getUTCDay() : 0,
                       'Europe/Lisbon',
-                      -1, 
+                      -1,
                       state.value instanceof Date ? state.value.getUTCHours() : 0,
                       state.value instanceof Date ? state.value.getUTCMinutes() : 0,
                       state.value instanceof Date ? state.value.getUTCSeconds() : 0
