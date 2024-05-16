@@ -27,6 +27,7 @@ import { ModalCreateTrip } from "./modalCreateTrip";
 import { ModalDeleteTrip } from "./modalDeleteTrip";
 import { useNavigate} from "@tanstack/react-router";
 import { useCookies } from "react-cookie";
+import {User} from "@/types/user.ts";
 
 const statusColorMap: Record<string, ChipProps["color"]> = {
   ontime: "success",
@@ -61,6 +62,9 @@ function capitalize(str: string) {
 }
 
 export function TripsTable() {
+  const [cookies] = useCookies(["user"]);
+  const user = cookies.user as User;
+
   const [filterValue, setFilterValue] = useState("");
   const [selectedKeys, setSelectedKeys] = useState<Selection>(new Set([]));
   const [visibleColumns, setVisibleColumns] = useState<Selection>(new Set(INITIAL_VISIBLE_COLUMNS));
@@ -74,8 +78,8 @@ export function TripsTable() {
   const navigate = useNavigate();
 
   const {data: trips, isLoading} = useQuery<Trip[], Error>({
-   queryKey: ['trips'], 
-   queryFn: () => getTrips().then((data) => data.map((trip) => ({...trip, departureTime: new Date(trip.departureTime), arrivalTime: new Date(trip.arrivalTime)}))),
+   queryKey: ['trips', user.token],
+   queryFn: () => getTrips(user.token).then((data) => data.map((trip) => ({...trip, departureTime: new Date(trip.departureTime), arrivalTime: new Date(trip.arrivalTime)}))),
   });
 
 

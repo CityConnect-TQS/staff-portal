@@ -1,14 +1,23 @@
+export type Role = "ADMIN" | "STAFF" | "USER";
+
 export interface User {
-    id: number;
-    username: string;
-    name: string;
-    email: string;
-  }
-  
-  export type UserCreate = Omit<User, "id"> & {
-    password: string;
-  };
-  
-  export type UserLogin = Pick<UserCreate, "email" | "password">;
-  
-  export type UserReference = Pick<User, "id">;
+  id: number;
+  name: string;
+  email: string;
+  roles: Role[];
+  token: string;
+  expires: number;
+}
+
+export interface UserCreate {
+  name: string;
+  email: string;
+  password: string;
+}
+
+export interface UserLogin {
+  email: string;
+  password: string;
+}
+
+export type UserReference = Pick<User, "id">;
