@@ -27,7 +27,7 @@ export function TripDetailsBoard() {
     queryKey: ["cities"],
     queryFn: async () =>
       await getCities().then((data) =>
-        data.map((city) => ({ id: city.id, name: city.name })),
+        data.map((city) => ({ id: city.id, name: city.name }))
       ),
   });
 
@@ -39,7 +39,7 @@ export function TripDetailsBoard() {
           id: bus.id,
           company: bus.company,
           capacity: bus.capacity,
-        })),
+        }))
       ),
   });
 
@@ -73,7 +73,7 @@ export function TripDetailsBoard() {
     },
     onSubmit: async ({ value }) => {
       const departureCity = cities?.find(
-        (city) => city.id == value.departure.id,
+        (city) => city.id == value.departure.id
       );
       const arrivalCity = cities?.find((city) => city.id == value.arrival.id);
       const bus = buses?.find((bus) => bus.id == value.bus.id);
@@ -107,7 +107,7 @@ export function TripDetailsBoard() {
       const tripCreated = await updateTrip(
         selectedTrip.trip.id,
         trip,
-        user.token,
+        user.token
       ).catch((error) => {
         console.error("Error:", error);
         return;
@@ -131,7 +131,7 @@ export function TripDetailsBoard() {
 
       setCookies(
         "selectedTrip",
-        JSON.stringify({ trip: tripUpdated, edit: false }),
+        JSON.stringify({ trip: tripUpdated, edit: false })
       );
       setOnEdit(false);
 
@@ -218,7 +218,7 @@ export function TripDetailsBoard() {
                   defaultInputValue={selectedTrip.trip.departure.name}
                   onSelectionChange={(selectedValue) => {
                     const selectedcities = cities?.find(
-                      (cities) => cities.id == selectedValue,
+                      (cities) => cities.id == selectedValue
                     );
                     if (selectedcities) {
                       handleChange({ id: selectedcities.id });
@@ -258,7 +258,7 @@ export function TripDetailsBoard() {
                   defaultInputValue={selectedTrip.trip.arrival.name}
                   onSelectionChange={(selectedValue) => {
                     const selectedcities = cities?.find(
-                      (cities) => cities.id == selectedValue,
+                      (cities) => cities.id == selectedValue
                     );
                     if (selectedcities) {
                       handleChange({ id: selectedcities.id });
@@ -295,7 +295,7 @@ export function TripDetailsBoard() {
                     new ZonedDateTime(
                       "era",
                       new Date(
-                        selectedTrip.trip.departureTime,
+                        selectedTrip.trip.departureTime
                       ).getUTCFullYear(),
                       new Date(selectedTrip.trip.departureTime).getUTCMonth() +
                         1,
@@ -304,7 +304,7 @@ export function TripDetailsBoard() {
                       -1,
                       new Date(selectedTrip.trip.departureTime).getUTCHours(),
                       new Date(selectedTrip.trip.departureTime).getUTCMinutes(),
-                      new Date(selectedTrip.trip.departureTime).getUTCSeconds(),
+                      new Date(selectedTrip.trip.departureTime).getUTCSeconds()
                     )
                   }
                   onChange={(value: ZonedDateTime) => {
@@ -336,7 +336,7 @@ export function TripDetailsBoard() {
                       -1,
                       new Date(selectedTrip.trip.arrivalTime).getUTCHours(),
                       new Date(selectedTrip.trip.arrivalTime).getUTCMinutes(),
-                      new Date(selectedTrip.trip.arrivalTime).getUTCSeconds(),
+                      new Date(selectedTrip.trip.arrivalTime).getUTCSeconds()
                     )
                   }
                   onChange={(value: ZonedDateTime) => {
@@ -405,7 +405,7 @@ export function TripDetailsBoard() {
                   defaultInputValue={`${selectedTrip.trip.bus.company} - ${selectedTrip.trip.bus.capacity} Seats`}
                   onSelectionChange={(selectedValue) => {
                     const selectedbuses = buses?.find(
-                      (buses) => buses.id == selectedValue,
+                      (buses) => buses.id == selectedValue
                     );
                     if (selectedbuses) {
                       handleChange({ id: selectedbuses.id });

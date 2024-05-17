@@ -13,16 +13,20 @@ import { createFileRoute } from '@tanstack/react-router'
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
-import { Route as TripDetailsImport } from './routes/tripDetails'
-import { Route as IndexImport } from './routes/index'
 
 // Create Virtual Routes
 
+const TripDetailsLazyImport = createFileRoute('/tripDetails')()
 const LoginLazyImport = createFileRoute('/login')()
 const BusLazyImport = createFileRoute('/bus')()
-const TripDetailsLazyImport = createFileRoute('/tripDetails')()
+const IndexLazyImport = createFileRoute('/')()
 
 // Create/Update Routes
+
+const TripDetailsLazyRoute = TripDetailsLazyImport.update({
+  path: '/tripDetails',
+  getParentRoute: () => rootRoute,
+} as any).lazy(() => import('./routes/tripDetails.lazy').then((d) => d.Route))
 
 const LoginLazyRoute = LoginLazyImport.update({
   path: '/login',
@@ -34,31 +38,17 @@ const BusLazyRoute = BusLazyImport.update({
   getParentRoute: () => rootRoute,
 } as any).lazy(() => import('./routes/bus.lazy').then((d) => d.Route))
 
-const TripDetailsLazyRoute = TripDetailsLazyImport.update({
-  path: '/tripDetails',
-  getParentRoute: () => rootRoute,
-} as any).lazy(() => import('./routes/tripDetails.lazy').then((d) => d.Route))
-
-const AboutLazyRoute = AboutLazyImport.update({
-  path: '/about',
-  getParentRoute: () => rootRoute,
-} as any).lazy(() => import('./routes/about.lazy').then((d) => d.Route))
-
 const IndexLazyRoute = IndexLazyImport.update({
   path: '/',
   getParentRoute: () => rootRoute,
-} as any)
+} as any).lazy(() => import('./routes/index.lazy').then((d) => d.Route))
 
 // Populate the FileRoutesByPath interface
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
     '/': {
-      preLoaderRoute: typeof IndexImport
-      parentRoute: typeof rootRoute
-    }
-    '/tripDetails': {
-      preLoaderRoute: typeof TripDetailsLazyImport
+      preLoaderRoute: typeof IndexLazyImport
       parentRoute: typeof rootRoute
     }
     '/bus': {
@@ -69,16 +59,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LoginLazyImport
       parentRoute: typeof rootRoute
     }
+    '/tripDetails': {
+      preLoaderRoute: typeof TripDetailsLazyImport
+      parentRoute: typeof rootRoute
+    }
   }
 }
 
 // Create and export the route tree
 
 export const routeTree = rootRoute.addChildren([
-  IndexRoute,
-  TripDetailsLazyRoute,
+  IndexLazyRoute,
   BusLazyRoute,
   LoginLazyRoute,
+  TripDetailsLazyRoute,
 ])
 
 /* prettier-ignore-end */

@@ -4,9 +4,14 @@ import { MaterialSymbol } from "react-material-symbols";
 import { useQueryClient } from "@tanstack/react-query";
 import { Bus, BusCreate } from "@/types/bus";
 import { createBus, updateBus } from "@/services/busService";
+import { useCookies } from "react-cookie";
+import { User } from "@/types/user";
 
 export function ModalCreateBus({ company, edit, bus }: {company?: string, edit: boolean, bus?: Bus}) {
   const {isOpen, onOpen, onClose} = useDisclosure();
+
+  const [cookies] = useCookies(["user"]);
+  const user = cookies.user as User;
 
   const queryClient = useQueryClient();
 
@@ -25,7 +30,7 @@ export function ModalCreateBus({ company, edit, bus }: {company?: string, edit: 
     };
 
     if (edit && bus) {
-      const busUpdated = await updateBus(bus.id, busNew).catch((error) => {
+      const busUpdated = await updateBus(bus.id, busNew, user.token).catch((error) => {
         console.error('Error:', error);
         return;
       })
@@ -35,7 +40,7 @@ export function ModalCreateBus({ company, edit, bus }: {company?: string, edit: 
       }
 
     } else {
-      const busCreated = await createBus(busNew).catch((error) => {
+      const busCreated = await createBus(busNew, user.token).catch((error) => {
         console.error('Error:', error);
         return;
       });
