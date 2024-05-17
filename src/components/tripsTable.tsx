@@ -30,9 +30,11 @@ import { useCookies } from "react-cookie";
 import { User } from "@/types/user.ts";
 
 const statusColorMap: Record<string, ChipProps["color"]> = {
-  ontime: "success",
-  delayed: "warning",
-  arrived: "danger",
+  ontime: "primary",
+  delayed: "danger",
+  arrived: "success",
+  onboarding: "success",
+  departed: "warning",
 };
 
 export interface Alert {
@@ -65,6 +67,8 @@ const statusOptions = [
   { name: "OnTime", uid: "ontime" },
   { name: "Delayed", uid: "delayed" },
   { name: "Arrived", uid: "arrived" },
+  { name: "OnBoarding", uid: "onboarding" },
+  { name: "Departed", uid: "departed" },
 ];
 
 function capitalize(str: string) {
@@ -241,6 +245,7 @@ export function TripsTable() {
             </div>
           );
         case "status":
+          console.log(trip.status);
           return (
             <Chip
               className="capitalize"
