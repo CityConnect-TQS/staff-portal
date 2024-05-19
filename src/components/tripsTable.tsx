@@ -193,7 +193,10 @@ export function TripsTable() {
         case "departure":
           return (
             <div className="flex flex-col">
-              <p className="text-bold text-small capitalize" id="departureName">
+              <p
+                className="text-bold text-small capitalize"
+                id={`departureName-${trip.id}`}
+              >
                 {trip.departure.name}
               </p>
               <p className="text-bold text-tiny capitalize text-default-400">
@@ -210,7 +213,10 @@ export function TripsTable() {
         case "arrival":
           return (
             <div className="flex flex-col">
-              <p className="text-bold text-small capitalize" id="arrivalName">
+              <p
+                className="text-bold text-small capitalize"
+                id={`arrivalName-${trip.id}`}
+              >
                 {trip.arrival.name}
               </p>
               <p className="text-bold text-tiny capitalize text-default-400">
@@ -476,7 +482,7 @@ export function TripsTable() {
   return (
     <div className="flex flex-col gap-4" id="trips">
       {alerts?.active && (
-        <Chip color={alerts.type} variant="flat" radius="sm">
+        <Chip color={alerts.type} variant="flat" radius="sm" id="alertsChip">
           {alerts.message}
         </Chip>
       )}
@@ -501,6 +507,7 @@ export function TripsTable() {
               key={column.uid}
               align={column.uid === "actions" ? "center" : "start"}
               allowsSorting={column.sortable}
+              id={column.uid}
             >
               {column.name}
             </TableColumn>
