@@ -111,7 +111,7 @@ function Login() {
                 variant={isSubmitting ? "flat" : "solid"}
                 isDisabled={!canSubmit}
                 id={"loginBtn"}
-                onPress={() => {
+                onClick={() => {
                   handleSubmit().catch(() => {
                     console.log("Error", "Failed to log in");
                   });
