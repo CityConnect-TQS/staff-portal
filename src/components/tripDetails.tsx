@@ -27,7 +27,7 @@ export function TripDetailsBoard() {
     queryKey: ["cities"],
     queryFn: async () =>
       await getCities().then((data) =>
-        data.map((city) => ({ id: city.id, name: city.name })),
+        data.map((city) => ({ id: city.id, name: city.name }))
       ),
   });
 
@@ -39,7 +39,7 @@ export function TripDetailsBoard() {
           id: bus.id,
           company: bus.company,
           capacity: bus.capacity,
-        })),
+        }))
       ),
   });
 
@@ -73,7 +73,7 @@ export function TripDetailsBoard() {
     },
     onSubmit: async ({ value }) => {
       const departureCity = cities?.find(
-        (city) => city.id == value.departure.id,
+        (city) => city.id == value.departure.id
       );
       const arrivalCity = cities?.find((city) => city.id == value.arrival.id);
       const bus = buses?.find((bus) => bus.id == value.bus.id);
@@ -107,7 +107,7 @@ export function TripDetailsBoard() {
       const tripCreated = await updateTrip(
         selectedTrip.trip.id,
         trip,
-        user.token,
+        user.token
       ).catch((error) => {
         console.error("Error:", error);
         return;
@@ -131,7 +131,7 @@ export function TripDetailsBoard() {
 
       setCookies(
         "selectedTrip",
-        JSON.stringify({ trip: tripUpdated, edit: false }),
+        JSON.stringify({ trip: tripUpdated, edit: false })
       );
       setOnEdit(false);
 
@@ -171,9 +171,10 @@ export function TripDetailsBoard() {
         {onEdit && (
           <Button
             color="primary"
-            onPress={() => {
+            onClick={() => {
               void handleSubmit();
             }}
+            id="saveTripBtn"
             variant="flat"
           >
             <MaterialSymbol icon="save" size={20} /> Save
@@ -182,10 +183,11 @@ export function TripDetailsBoard() {
         {!onEdit && (
           <Button
             color="secondary"
-            onPress={() => {
+            onClick={() => {
               setOnEdit(true);
             }}
             variant="flat"
+            id="editTripBtn"
           >
             <MaterialSymbol icon="edit" size={20} />
             Edit
@@ -195,7 +197,11 @@ export function TripDetailsBoard() {
       <form>
         <div className="flex flex-col">
           <p className="font-medium text-2xl my-4">Trip Details</p>
-          {state.errors && <span className="text-red-500">{state.errors}</span>}
+          {state.errors && (
+            <span className="text-red-500" id="errorMessageSpan">
+              {state.errors}
+            </span>
+          )}
 
           <div className="flex flex-row justify-center gap-8">
             <Field
@@ -210,15 +216,16 @@ export function TripDetailsBoard() {
               {({ state, handleChange, handleBlur }) => (
                 <Autocomplete
                   isDisabled={!onEdit}
-                  id="filled-basic"
+                  id="departureCity"
                   isRequired
                   label="Departure City"
                   size="lg"
+                  itemID=""
                   defaultItems={cities}
                   defaultInputValue={selectedTrip.trip.departure.name}
                   onSelectionChange={(selectedValue) => {
                     const selectedcities = cities?.find(
-                      (cities) => cities.id == selectedValue,
+                      (cities) => cities.id == selectedValue
                     );
                     if (selectedcities) {
                       handleChange({ id: selectedcities.id });
@@ -232,7 +239,11 @@ export function TripDetailsBoard() {
                   errorMessage={state.meta.errors}
                 >
                   {(item) => (
-                    <AutocompleteItem key={item.id} textValue={item.name}>
+                    <AutocompleteItem
+                      key={item.id}
+                      textValue={item.name}
+                      id={`departure${item.name}`}
+                    >
                       {item.name}
                     </AutocompleteItem>
                   )}
@@ -252,13 +263,14 @@ export function TripDetailsBoard() {
                 <Autocomplete
                   isDisabled={!onEdit}
                   isRequired
+                  id="arrivalCity"
                   label="Arrival cities"
                   size="lg"
                   defaultItems={cities}
                   defaultInputValue={selectedTrip.trip.arrival.name}
                   onSelectionChange={(selectedValue) => {
                     const selectedcities = cities?.find(
-                      (cities) => cities.id == selectedValue,
+                      (cities) => cities.id == selectedValue
                     );
                     if (selectedcities) {
                       handleChange({ id: selectedcities.id });
@@ -272,7 +284,11 @@ export function TripDetailsBoard() {
                   errorMessage={state.meta.errors}
                 >
                   {(item) => (
-                    <AutocompleteItem key={item.id} textValue={item.name}>
+                    <AutocompleteItem
+                      key={item.id}
+                      textValue={item.name}
+                      id={`arrival${item.name}`}
+                    >
                       {item.name}
                     </AutocompleteItem>
                   )}
@@ -295,7 +311,7 @@ export function TripDetailsBoard() {
                     new ZonedDateTime(
                       "era",
                       new Date(
-                        selectedTrip.trip.departureTime,
+                        selectedTrip.trip.departureTime
                       ).getUTCFullYear(),
                       new Date(selectedTrip.trip.departureTime).getUTCMonth() +
                         1,
@@ -304,7 +320,7 @@ export function TripDetailsBoard() {
                       -1,
                       new Date(selectedTrip.trip.departureTime).getUTCHours(),
                       new Date(selectedTrip.trip.departureTime).getUTCMinutes(),
-                      new Date(selectedTrip.trip.departureTime).getUTCSeconds(),
+                      new Date(selectedTrip.trip.departureTime).getUTCSeconds()
                     )
                   }
                   onChange={(value: ZonedDateTime) => {
@@ -336,7 +352,7 @@ export function TripDetailsBoard() {
                       -1,
                       new Date(selectedTrip.trip.arrivalTime).getUTCHours(),
                       new Date(selectedTrip.trip.arrivalTime).getUTCMinutes(),
-                      new Date(selectedTrip.trip.arrivalTime).getUTCSeconds(),
+                      new Date(selectedTrip.trip.arrivalTime).getUTCSeconds()
                     )
                   }
                   onChange={(value: ZonedDateTime) => {
@@ -364,6 +380,7 @@ export function TripDetailsBoard() {
                 isDisabled={!onEdit}
                 type="number"
                 label="Price"
+                id="priceInput"
                 placeholder="0.00"
                 className="w-full"
                 size="lg"
@@ -405,7 +422,7 @@ export function TripDetailsBoard() {
                   defaultInputValue={`${selectedTrip.trip.bus.company} - ${selectedTrip.trip.bus.capacity} Seats`}
                   onSelectionChange={(selectedValue) => {
                     const selectedbuses = buses?.find(
-                      (buses) => buses.id == selectedValue,
+                      (buses) => buses.id == selectedValue
                     );
                     if (selectedbuses) {
                       handleChange({ id: selectedbuses.id });

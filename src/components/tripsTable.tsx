@@ -195,7 +195,7 @@ export function TripsTable() {
             <div className="flex flex-col">
               <p
                 className="text-bold text-small capitalize"
-                id={`departureName-${trip.id}`}
+                id={`departureName${trip.id}`}
               >
                 {trip.departure.name}
               </p>
@@ -215,7 +215,7 @@ export function TripsTable() {
             <div className="flex flex-col">
               <p
                 className="text-bold text-small capitalize"
-                id={`arrivalName-${trip.id}`}
+                id={`arrivalName${trip.id}`}
               >
                 {trip.arrival.name}
               </p>
@@ -269,6 +269,7 @@ export function TripsTable() {
                   variant="light"
                   size="sm"
                   onClick={handleSelectTrip(trip, true)}
+                  id={`editTrip${trip.id}`}
                 >
                   <MaterialSymbol icon="edit" size={20} />
                 </Button>
