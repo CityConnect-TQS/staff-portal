@@ -37,15 +37,12 @@ const statusColorMap: Record<string, ChipProps["color"]> = {
   departed: "warning",
 };
 
-<<<<<<< HEAD
 export interface Alert {
   message: string;
   type: "success" | "warning";
   active: boolean;
 }
 
-=======
->>>>>>> origin/main
 const INITIAL_VISIBLE_COLUMNS = [
   "departure",
   "arrival",
@@ -69,11 +66,8 @@ const columns = [
 const statusOptions = [
   { name: "OnTime", uid: "ontime" },
   { name: "Delayed", uid: "delayed" },
-<<<<<<< HEAD
   { name: "Arrived", uid: "arrived" },
   { name: "OnBoarding", uid: "onboarding" },
-=======
->>>>>>> origin/main
   { name: "Departed", uid: "departed" },
 ];
 
@@ -153,11 +147,7 @@ export function TripsTable() {
   const pages = Math.ceil(filteredItems.length / rowsPerPage);
 
   const sortedItems = useMemo(() => {
-<<<<<<< HEAD
     return [...filteredItems].sort((a: Trip, b: Trip) => {
-=======
-    return [...items].sort((a: Trip, b: Trip) => {
->>>>>>> origin/main
       const first = a[sortDescriptor.column as keyof Trip];
       const second = b[sortDescriptor.column as keyof Trip];
 
@@ -215,14 +205,10 @@ export function TripsTable() {
         case "departure":
           return (
             <div className="flex flex-col">
-<<<<<<< HEAD
-              <p className="text-bold text-small capitalize">
-=======
               <p
                 className="text-bold text-small capitalize"
                 id={`departureName${trip.id}`}
               >
->>>>>>> origin/main
                 {trip.departure.name}
               </p>
               <p className="text-bold text-tiny capitalize text-default-400">
@@ -239,14 +225,10 @@ export function TripsTable() {
         case "arrival":
           return (
             <div className="flex flex-col">
-<<<<<<< HEAD
-              <p className="text-bold text-small capitalize">
-=======
               <p
                 className="text-bold text-small capitalize"
                 id={`arrivalName${trip.id}`}
               >
->>>>>>> origin/main
                 {trip.arrival.name}
               </p>
               <p className="text-bold text-tiny capitalize text-default-400">
@@ -270,10 +252,6 @@ export function TripsTable() {
             </div>
           );
         case "status":
-<<<<<<< HEAD
-          console.log(trip.status);
-=======
->>>>>>> origin/main
           return (
             <Chip
               className="capitalize"
@@ -303,10 +281,7 @@ export function TripsTable() {
                   variant="light"
                   size="sm"
                   onClick={handleSelectTrip(trip, true)}
-<<<<<<< HEAD
-=======
                   id={`editTrip${trip.id}`}
->>>>>>> origin/main
                 >
                   <MaterialSymbol icon="edit" size={20} />
                 </Button>
@@ -390,6 +365,7 @@ export function TripsTable() {
             value={filterValue}
             onClear={() => onClear()}
             onValueChange={onSearchChange}
+            id="searchTrips"
           />
           <div className="flex gap-3">
             <Dropdown>
@@ -505,15 +481,6 @@ export function TripsTable() {
     );
   }, [page, pages, onPreviousPage, onNextPage]);
 
-<<<<<<< HEAD
-=======
-  interface Alert {
-    message: string;
-    type: "success" | "warning";
-    active: boolean;
-  }
-
->>>>>>> origin/main
   const { data: alerts } = useQuery<Alert, Error>({
     queryKey: ["alerts"],
   });
@@ -521,15 +488,9 @@ export function TripsTable() {
   if (isLoading) return <p>Loading...</p>;
 
   return (
-<<<<<<< HEAD
-    <div className="flex flex-col gap-4">
-      {alerts?.active && (
-        <Chip color={alerts.type} variant="flat" radius="sm">
-=======
     <div className="flex flex-col gap-4" id="trips">
       {alerts?.active && (
         <Chip color={alerts.type} variant="flat" radius="sm" id="alertsChip">
->>>>>>> origin/main
           {alerts.message}
         </Chip>
       )}
@@ -554,20 +515,13 @@ export function TripsTable() {
               key={column.uid}
               align={column.uid === "actions" ? "center" : "start"}
               allowsSorting={column.sortable}
-<<<<<<< HEAD
-=======
               id={column.uid}
->>>>>>> origin/main
             >
               {column.name}
             </TableColumn>
           )}
         </TableHeader>
-<<<<<<< HEAD
         <TableBody emptyContent={"No trips found"} items={items}>
-=======
-        <TableBody emptyContent={"No trips found"} items={sortedItems}>
->>>>>>> origin/main
           {(item) => (
             <TableRow key={item.id}>
               {(columnKey) => (
