@@ -1,6 +1,7 @@
-FROM oven/bun:1 as builder
+FROM oven/bun:1 AS builder
 WORKDIR /app
 COPY . .
+ARG VITE_HOST_URL=deti-tqs-16.ua.pt
 RUN bun install --frozen-lockfile
 RUN bun run build
 
