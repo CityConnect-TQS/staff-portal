@@ -41,6 +41,8 @@ export function BusTable({ buses }: { buses: Bus[] }) {
     return sortedItems?.slice(start, end) ?? [];
   }, [page, sortedItems]);
 
+  const orderedKeys = ["id", "capacity", "company"];
+
   return (
     <Table
       bottomContent={
@@ -77,8 +79,8 @@ export function BusTable({ buses }: { buses: Bus[] }) {
       </TableHeader>
       <TableBody emptyContent={"No trips found"} items={items}>
         {(item) => (
-          <TableRow key={item.id}>
-            {Object.keys(item).map((columnKey) =>
+          <TableRow key={item.id} id={`${item.company}Bus`}>
+            {orderedKeys.map((columnKey) =>
               columnKey === "company" ? (
                 <TableCell key={columnKey} align="center">
                   <div className="flex flex-row">
@@ -87,7 +89,11 @@ export function BusTable({ buses }: { buses: Bus[] }) {
                   </div>
                 </TableCell>
               ) : (
-                <TableCell key={columnKey} align="center">
+                <TableCell
+                  key={columnKey}
+                  align="center"
+                  id={`${columnKey}${item.id}`}
+                >
                   {getKeyValue(item, columnKey)}
                 </TableCell>
               )

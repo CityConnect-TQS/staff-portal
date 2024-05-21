@@ -68,7 +68,13 @@ export function ModalDeleteBus({ bus }: { bus: Bus }) {
 
   return (
     <>
-      <Button endContent onClick={onOpen} color="danger" variant="light">
+      <Button
+        endContent
+        onClick={onOpen}
+        color="danger"
+        variant="light"
+        id={`deleteBusBtn${bus.id}`}
+      >
         <MaterialSymbol icon="delete" size={20} />
       </Button>
 
@@ -84,7 +90,10 @@ export function ModalDeleteBus({ bus }: { bus: Bus }) {
         <ModalContent>
           {(onClose) => (
             <>
-              <ModalHeader className="flex flex-col gap-1">
+              <ModalHeader
+                className="flex flex-col gap-1"
+                id="headerModalDeleteBus"
+              >
                 Delete Bus {bus.id} - {bus.company}
               </ModalHeader>
               {alerts?.active && (
@@ -108,7 +117,7 @@ export function ModalDeleteBus({ bus }: { bus: Bus }) {
                 <Button color="default" onPress={onClose}>
                   Close
                 </Button>
-                <Button color="danger" onPress={handleDelete}>
+                <Button color="danger" onClick={handleDelete} id="deleteBusBtn">
                   Delete
                 </Button>
               </ModalFooter>

@@ -66,7 +66,8 @@ export function NavbarStaff() {
             <Button
               color={item.isActive ? "primary" : "default"}
               variant="light"
-              onPress={() => void navigate({ to: item.link })}
+              onClick={() => void navigate({ to: item.link })}
+              id={`${item.name}NavBtn`}
             >
               {item.name}
             </Button>
@@ -164,7 +165,8 @@ export function NavbarStaff() {
             <Button
               color={item.isActive ? "primary" : "default"}
               variant="light"
-              onPress={() => void navigate({ to: item.link })}
+              onClick={() => void navigate({ to: item.link })}
+              id={`${item.name}Btn`}
             >
               {item.name}
             </Button>

@@ -4,11 +4,11 @@ import { NavbarStaff } from "@/components/navbar";
 import { getBuses } from "@/services/busService";
 import { Bus } from "@/types/bus";
 import { useQuery } from "@tanstack/react-query";
-import { Navigate, createLazyFileRoute } from "@tanstack/react-router";
+import { Navigate, createFileRoute } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
 import { Chip } from "@nextui-org/react";
 
-export const Route = createLazyFileRoute("/bus")({
+export const Route = createFileRoute("/bus")({
   component: Buses,
   errorComponent: () => <Navigate search={{}} to={"/login"} />,
   beforeLoad: ({ context }) => {
@@ -17,6 +17,7 @@ export const Route = createLazyFileRoute("/bus")({
     }
   },
 });
+
 interface BusGroups {
   company: string;
   buses: Bus[];
@@ -59,7 +60,13 @@ function Buses() {
         <ModalCreateBus company="" edit={false} />
       </div>
       {alerts?.active && (
-        <Chip color={alerts.type} variant="flat" radius="sm">
+        <Chip
+          color={alerts.type}
+          variant="flat"
+          radius="sm"
+          className="ml-4"
+          id="chipAlerts"
+        >
           {alerts.message}
         </Chip>
       )}
@@ -67,7 +74,12 @@ function Buses() {
         {busGroups?.map((group, index) => (
           <div key={index}>
             <div className="flex flex-row justify-between">
-              <h2 className="text-xl font-medium mb-4">{group.company}</h2>
+              <h2
+                className="text-xl font-medium mb-4"
+                id={`${group.company}Name`}
+              >
+                {group.company}
+              </h2>
               <ModalCreateBus company={group.company} edit={false} />
             </div>
             <BusTable buses={group.buses} />
