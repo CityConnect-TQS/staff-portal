@@ -30,10 +30,18 @@ import { useCookies } from "react-cookie";
 import { User } from "@/types/user.ts";
 
 const statusColorMap: Record<string, ChipProps["color"]> = {
-  ontime: "success",
-  delayed: "warning",
-  departed: "danger",
+  ontime: "primary",
+  delayed: "danger",
+  arrived: "success",
+  onboarding: "success",
+  departed: "warning",
 };
+
+export interface Alert {
+  message: string;
+  type: "success" | "warning";
+  active: boolean;
+}
 
 const INITIAL_VISIBLE_COLUMNS = [
   "departure",
@@ -58,6 +66,8 @@ const columns = [
 const statusOptions = [
   { name: "OnTime", uid: "ontime" },
   { name: "Delayed", uid: "delayed" },
+  { name: "Arrived", uid: "arrived" },
+  { name: "OnBoarding", uid: "onboarding" },
   { name: "Departed", uid: "departed" },
 ];
 
@@ -136,15 +146,8 @@ export function TripsTable() {
 
   const pages = Math.ceil(filteredItems.length / rowsPerPage);
 
-  const items = useMemo(() => {
-    const start = (page - 1) * rowsPerPage;
-    const end = start + rowsPerPage;
-
-    return filteredItems.slice(start, end);
-  }, [page, filteredItems, rowsPerPage]);
-
   const sortedItems = useMemo(() => {
-    return [...items].sort((a: Trip, b: Trip) => {
+    return [...filteredItems].sort((a: Trip, b: Trip) => {
       const first = a[sortDescriptor.column as keyof Trip];
       const second = b[sortDescriptor.column as keyof Trip];
 
@@ -172,7 +175,16 @@ export function TripsTable() {
 
       return sortDescriptor.direction === "descending" ? -cmp : cmp;
     });
-  }, [sortDescriptor, items]);
+  }, [filteredItems, sortDescriptor.column, sortDescriptor.direction]);
+
+  const items = useMemo(() => {
+    const start = (page - 1) * rowsPerPage;
+    const end = start + rowsPerPage;
+
+    // Return the items with today departure date or later
+
+    return sortedItems.slice(start, end);
+  }, [page, rowsPerPage, sortedItems]);
 
   const [, setCookies] = useCookies(["selectedTrip"]);
 
@@ -353,6 +365,7 @@ export function TripsTable() {
             value={filterValue}
             onClear={() => onClear()}
             onValueChange={onSearchChange}
+            id="searchTrips"
           />
           <div className="flex gap-3">
             <Dropdown>
@@ -468,12 +481,6 @@ export function TripsTable() {
     );
   }, [page, pages, onPreviousPage, onNextPage]);
 
-  interface Alert {
-    message: string;
-    type: "success" | "warning";
-    active: boolean;
-  }
-
   const { data: alerts } = useQuery<Alert, Error>({
     queryKey: ["alerts"],
   });
@@ -514,7 +521,7 @@ export function TripsTable() {
             </TableColumn>
           )}
         </TableHeader>
-        <TableBody emptyContent={"No trips found"} items={sortedItems}>
+        <TableBody emptyContent={"No trips found"} items={items}>
           {(item) => (
             <TableRow key={item.id}>
               {(columnKey) => (

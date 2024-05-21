@@ -8,6 +8,7 @@ import {
   ModalFooter,
   Button,
   useDisclosure,
+  Chip,
 } from "@nextui-org/react";
 import { useQueryClient } from "@tanstack/react-query";
 import { MaterialSymbol } from "react-material-symbols";
@@ -20,6 +21,12 @@ export function ModalDeleteTrip({ trip }: { trip: Trip }) {
   const user = cookies.user as User;
 
   const queryClient = useQueryClient();
+
+  const alerts = queryClient.getQueryData<{
+    message: string;
+    type: "success" | "warning";
+    active: boolean;
+  }>(["alerts"]);
 
   const handleDelete = () => {
     deleteTrip(trip.id, user.token)
@@ -78,6 +85,11 @@ export function ModalDeleteTrip({ trip }: { trip: Trip }) {
               >
                 Delete Trip {trip.departure.name} - {trip.arrival.name}
               </ModalHeader>
+              {alerts?.active && (
+                <Chip color={alerts.type} variant="flat" radius="sm">
+                  {alerts.message}
+                </Chip>
+              )}
               <ModalBody>
                 <p>
                   Are you sure you want to delete the trip from{" "}

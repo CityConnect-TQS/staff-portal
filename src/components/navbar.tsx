@@ -37,14 +37,14 @@ export function NavbarStaff() {
         matchRoute({ to: "/tripDetails" }) !== false,
     },
     {
-      name: "About",
-      link: "/about",
-      isActive: matchRoute({ to: "/about" }) !== false,
+      name: "Buses",
+      link: "/bus",
+      isActive: matchRoute({ to: "/bus" }) !== false,
     },
   ];
 
   return (
-    <Navbar onMenuOpenChange={setIsMenuOpen}>
+    <Navbar onMenuOpenChange={setIsMenuOpen} maxWidth="full">
       <NavbarContent>
         <NavbarMenuToggle
           aria-label={isMenuOpen ? "Close menu" : "Open menu"}
@@ -56,7 +56,7 @@ export function NavbarStaff() {
             alt="CityConnect"
             className="h-8 mr-4 w-auto rounded"
           />
-          <p className="font-bold text-inherit">CityConnect</p>
+          <p className="font-bold text-inherit text-xl">CityConnect</p>
         </NavbarBrand>
       </NavbarContent>
 
