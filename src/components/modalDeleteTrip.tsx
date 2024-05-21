@@ -65,6 +65,7 @@ export function ModalDeleteTrip({ trip }: { trip: Trip }) {
         color="danger"
         variant="light"
         onClick={onOpen}
+        id={`deleteTrip-${trip.id}`}
       />
       <Modal
         backdrop="opaque"
@@ -78,7 +79,10 @@ export function ModalDeleteTrip({ trip }: { trip: Trip }) {
         <ModalContent>
           {(onClose) => (
             <>
-              <ModalHeader className="flex flex-col gap-1">
+              <ModalHeader
+                className="flex flex-col gap-1"
+                id="modalDeleteTripTitle"
+              >
                 Delete Trip {trip.departure.name} - {trip.arrival.name}
               </ModalHeader>
               {alerts?.active && (
@@ -112,7 +116,7 @@ export function ModalDeleteTrip({ trip }: { trip: Trip }) {
                 <Button color="default" onPress={onClose}>
                   Close
                 </Button>
-                <Button color="danger" onPress={handleDelete}>
+                <Button color="danger" onClick={handleDelete} id="deleteBtn">
                   Delete
                 </Button>
               </ModalFooter>

@@ -171,9 +171,10 @@ export function TripDetailsBoard() {
         {onEdit && (
           <Button
             color="primary"
-            onPress={() => {
+            onClick={() => {
               void handleSubmit();
             }}
+            id="saveTripBtn"
             variant="flat"
           >
             <MaterialSymbol icon="save" size={20} /> Save
@@ -182,10 +183,11 @@ export function TripDetailsBoard() {
         {!onEdit && (
           <Button
             color="secondary"
-            onPress={() => {
+            onClick={() => {
               setOnEdit(true);
             }}
             variant="flat"
+            id="editTripBtn"
           >
             <MaterialSymbol icon="edit" size={20} />
             Edit
@@ -195,7 +197,11 @@ export function TripDetailsBoard() {
       <form>
         <div className="flex flex-col">
           <p className="font-medium text-2xl my-4">Trip Details</p>
-          {state.errors && <span className="text-red-500">{state.errors}</span>}
+          {state.errors && (
+            <span className="text-red-500" id="errorMessageSpan">
+              {state.errors}
+            </span>
+          )}
 
           <div className="flex flex-row justify-center gap-8">
             <Field
@@ -210,10 +216,11 @@ export function TripDetailsBoard() {
               {({ state, handleChange, handleBlur }) => (
                 <Autocomplete
                   isDisabled={!onEdit}
-                  id="filled-basic"
+                  id="departureCity"
                   isRequired
                   label="Departure City"
                   size="lg"
+                  itemID=""
                   defaultItems={cities}
                   defaultInputValue={selectedTrip.trip.departure.name}
                   onSelectionChange={(selectedValue) => {
@@ -232,7 +239,11 @@ export function TripDetailsBoard() {
                   errorMessage={state.meta.errors}
                 >
                   {(item) => (
-                    <AutocompleteItem key={item.id} textValue={item.name}>
+                    <AutocompleteItem
+                      key={item.id}
+                      textValue={item.name}
+                      id={`departure${item.name}`}
+                    >
                       {item.name}
                     </AutocompleteItem>
                   )}
@@ -252,6 +263,7 @@ export function TripDetailsBoard() {
                 <Autocomplete
                   isDisabled={!onEdit}
                   isRequired
+                  id="arrivalCity"
                   label="Arrival cities"
                   size="lg"
                   defaultItems={cities}
@@ -272,7 +284,11 @@ export function TripDetailsBoard() {
                   errorMessage={state.meta.errors}
                 >
                   {(item) => (
-                    <AutocompleteItem key={item.id} textValue={item.name}>
+                    <AutocompleteItem
+                      key={item.id}
+                      textValue={item.name}
+                      id={`arrival${item.name}`}
+                    >
                       {item.name}
                     </AutocompleteItem>
                   )}
@@ -364,6 +380,7 @@ export function TripDetailsBoard() {
                 isDisabled={!onEdit}
                 type="number"
                 label="Price"
+                id="priceInput"
                 placeholder="0.00"
                 className="w-full"
                 size="lg"
