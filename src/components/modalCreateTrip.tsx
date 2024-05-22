@@ -145,6 +145,7 @@ export function ModalCreateTrip() {
           color="primary"
           onClick={onOpen}
           endContent={<MaterialSymbol icon="add" size={20} />}
+          id="createTripBtn"
         >
           Add New
         </Button>
@@ -169,7 +170,7 @@ export function ModalCreateTrip() {
                   >
                     {({ state, handleChange, handleBlur }) => (
                       <Autocomplete
-                        id="filled-basic"
+                        id="departureCity"
                         isRequired
                         label="Departure City"
                         defaultItems={cities}
@@ -195,7 +196,11 @@ export function ModalCreateTrip() {
                         errorMessage={state.meta.errors}
                       >
                         {(item) => (
-                          <AutocompleteItem key={item.id} textValue={item.name}>
+                          <AutocompleteItem
+                            key={item.id}
+                            textValue={item.name}
+                            id={`departure-${item.name}`}
+                          >
                             {item.name}
                           </AutocompleteItem>
                         )}
@@ -241,6 +246,7 @@ export function ModalCreateTrip() {
                         onBlur={handleBlur}
                         isInvalid={state.meta.errors.length > 0}
                         errorMessage={state.meta.errors}
+                        id="departureTime"
                       />
                     )}
                   </Field>
@@ -276,9 +282,14 @@ export function ModalCreateTrip() {
                         variant="underlined"
                         isInvalid={state.meta.errors.length > 0}
                         errorMessage={state.meta.errors}
+                        id="arrivalCity"
                       >
                         {(item) => (
-                          <AutocompleteItem key={item.id} textValue={item.name}>
+                          <AutocompleteItem
+                            key={item.id}
+                            textValue={item.name}
+                            id={`arrival-${item.name}`}
+                          >
                             {item.name}
                           </AutocompleteItem>
                         )}
@@ -291,6 +302,7 @@ export function ModalCreateTrip() {
                         label="Arrival Date and Time"
                         variant="underlined"
                         hideTimeZone
+                        id="arrivalTime"
                         showMonthAndYearPickers
                         isRequired
                         defaultValue={
@@ -344,6 +356,7 @@ export function ModalCreateTrip() {
                         placeholder="0.00"
                         className="w-full"
                         isRequired
+                        id="price"
                         startContent={
                           <div className="pointer-events-none flex items-center">
                             <span className="text-default-400 text-small">
@@ -407,11 +420,13 @@ export function ModalCreateTrip() {
                         variant="underlined"
                         isInvalid={state.meta.errors.length > 0}
                         errorMessage={state.meta.errors}
+                        id="bus"
                       >
                         {(item) => (
                           <AutocompleteItem
                             key={item.id}
                             textValue={`${item.id} (${item.company} - ${item.capacity} seats)`}
+                            id={`bus${item.id}`}
                           >
                             {item.id} ({item.company} - {item.capacity} seats){" "}
                           </AutocompleteItem>
@@ -420,16 +435,17 @@ export function ModalCreateTrip() {
                     )}
                   </Field>
                   {state.errors && (
-                    <span className="text-red-500">{state.errors}</span>
+                    <span className="text-red-500" id="spanError">{state.errors}</span>
                   )}
                 </form>
               </ModalBody>
               <ModalFooter>
                 <Button
                   color="primary"
-                  onPress={() => {
+                  onClick={() => {
                     void handleSubmit();
                   }}
+                  id="saveTripBtn"
                 >
                   Save
                 </Button>
