@@ -18,6 +18,7 @@ const router = createRouter({
   context: {
     user: undefined!,
   },
+  basepath: "/staff",
 });
 
 declare module "@tanstack/react-router" {
