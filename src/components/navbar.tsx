@@ -125,7 +125,7 @@ export function NavbarStaff() {
                     id={"logoutBtn"}
                     startContent={<MaterialSymbol icon="logout" size={20} />}
                     onClick={() => {
-                      removeCookies("user");
+                      removeCookies("user", { path: "/" });
                       void navigate({ to: "/login" });
                     }}
                   >
