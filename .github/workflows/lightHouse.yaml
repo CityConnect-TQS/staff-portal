@@ -39,7 +39,7 @@ jobs:
           temporaryPublicStorage: true
 
       - name: Report results
-        uses: manrueda/lighthouse-report-actionl@latest
+        uses: manrueda/lighthouse-report-action@latest
         with:
           reports: ".lighthouseci"
           github-token: ${{ secrets.GITHUB_TOKEN }}
