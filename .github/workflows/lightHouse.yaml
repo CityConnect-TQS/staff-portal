@@ -68,7 +68,15 @@ jobs:
 
              core.setOutput("comment", comment);
 
+      - name: Report results
+        uses: manrueda/lighthouse-report-action@v1.1.2
+        with:
+          reports: ".lighthouseci"
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+      
+      
       - name: Add comment to PR
+        if: github.event_name == 'pull_request'
         id: comment_to_pr
         uses: marocchino/sticky-pull-request-comment@v2
         with:
