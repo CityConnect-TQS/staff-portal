@@ -26,6 +26,9 @@ jobs:
           key: "${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}"
           restore-keys: ${{ runner.os }}-m2
 
+      - name: Setup Chrome
+        uses: browser-actions/setup-chrome@v1
+
       - name: Up containers
         env:
           PRODUCTION: true
