@@ -35,11 +35,6 @@ jobs:
         uses: treosh/lighthouse-ci-action@v11
         with:
           urls: http://staff.localhost
+          budgetPath: ./budget.json
           uploadArtifacts: true
           temporaryPublicStorage: true
-
-      - name: Report results
-        uses: manrueda/lighthouse-report-action@v1.1.2
-        with:
-          reports: ".lighthouseci"
-          github-token: ${{ secrets.GITHUB_TOKEN }}
