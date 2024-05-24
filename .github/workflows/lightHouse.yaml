@@ -37,3 +37,9 @@ jobs:
           urls: http://staff.localhost
           uploadArtifacts: true
           temporaryPublicStorage: true
+
+      - name: Report results
+        uses: manrueda/lighthouse-report-action@v1.0.1
+        with:
+          reports: ".lighthouseci"
+          github-token: ${{ secrets.GITHUB_TOKEN }}
