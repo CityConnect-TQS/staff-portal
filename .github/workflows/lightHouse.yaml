@@ -19,13 +19,6 @@ jobs:
           token: ${{ secrets.PRIVATE_TOKEN }}
           submodules: recursive
 
-      - name: Cache Maven packages
-        uses: actions/cache@v4
-        with:
-          path: ~/.m2
-          key: "${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}"
-          restore-keys: ${{ runner.os }}-m2
-
       - name: Setup Chrome
         uses: browser-actions/setup-chrome@v1
 
@@ -38,12 +31,9 @@ jobs:
           POSTGRES_PASSWORD: ${{secrets.POSTGRES_PASSWORD}}
         run: docker compose -f compose.prod.yaml up -d --build
 
-      - name: Go to staff portal
-        run: cd staff-portal
-
       - name: Audit URLs using Lighthouse
-        uses: treosh/lighthouse-ci-action@v7
+        uses: treosh/lighthouse-ci-action@v11
         with:
-          urls: http://localhost/staff
+          urls: http://staff.localhost
           uploadArtifacts: true
           temporaryPublicStorage: true
