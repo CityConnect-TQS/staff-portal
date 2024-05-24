@@ -38,8 +38,7 @@ jobs:
           uploadArtifacts: true
           temporaryPublicStorage: true
 
-      - name: Upload Lighthouse Report
-        uses: actions/upload-artifact@v2
+      - name: Lighthouse
+        uses: foo-software/lighthouse-check-action@master
         with:
-          name: lighthouse-report
-          path: https://storage.googleapis.com/lighthouse-infrastructure.appspot.com/reports/1716555867544-4300.report.html
+          urls: "https://www.foo.software,https://www.google.com"
