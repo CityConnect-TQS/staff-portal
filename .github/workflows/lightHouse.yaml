@@ -38,7 +38,16 @@ jobs:
           uploadArtifacts: true
           temporaryPublicStorage: true
 
-      - name: Lighthouse
+      - name: Run Lighthouse
         uses: foo-software/lighthouse-check-action@master
         with:
-          urls: "https://www.foo.software,https://www.google.com"
+          awsAccessKeyId: ${{ secrets.LIGHTHOUSE_CHECK_AWS_ACCESS_KEY_ID }}
+          awsBucket: ${{ secrets.LIGHTHOUSE_CHECK_AWS_BUCKET }}
+          awsRegion: ${{ secrets.LIGHTHOUSE_CHECK_AWS_REGION }}
+          awsSecretAccessKey: ${{ secrets.LIGHTHOUSE_CHECK_AWS_SECRET_ACCESS_KEY }}
+          gitAuthor: ${{ github.actor }}
+          gitBranch: ${{ github.ref }}
+          gitHubAccessToken: ${{ secrets.GITHUB_TOKEN }}
+          urls: 'http://staff.localhost'
+          sha: ${{ github.sha }}
+          slackWebhookUrl: ${{ secrets.LIGHTHOUSE_CHECK_WEBHOOK_URL }}
