@@ -35,7 +35,7 @@ jobs:
         id: lighthouse_audit
         uses: treosh/lighthouse-ci-action@v11
         with:
-          urls: http://staff.localhost
+          urls: http://localhost/staff
           uploadArtifacts: true
           temporaryPublicStorage: true
 
