@@ -79,6 +79,7 @@ export function TripDetailsBoard() {
             ?.id ?? 0,
       },
       status: selectedTrip.trip.status,
+      delay: selectedTrip.trip.delay,
     },
     onSubmit: async ({ value }) => {
       const departureCity = cities?.find(
@@ -93,6 +94,7 @@ export function TripDetailsBoard() {
         .toISOString()
         .slice(0, 19);
       const price = value.price;
+      const delay = value.delay;
 
       if (
         !departureCity ||
@@ -111,8 +113,10 @@ export function TripDetailsBoard() {
         arrivalTime: arrivalTime,
         price: price,
         bus: bus,
-        status: selectedTrip.trip.status,
+        status: delay > 0 ? "DELAYED" : selectedTrip.trip.status,
+        delay: delay,
       };
+
       const tripCreated = await updateTrip(
         selectedTrip.trip.id,
         trip,
@@ -135,7 +139,8 @@ export function TripDetailsBoard() {
         price: tripCreated.price,
         bus: tripCreated.bus,
         freeSeats: selectedTrip.trip.freeSeats,
-        status: selectedTrip.trip.status,
+        status: tripCreated.delay > 0 ? "DELAYED" : selectedTrip.trip.status,
+        delay: tripCreated.delay,
       };
 
       setCookies(
@@ -424,6 +429,53 @@ export function TripDetailsBoard() {
               />
             )}
           </Field>
+          <div className="flex flex-row">
+            <Field
+              name="delay"
+              validators={{
+                onChange: (value) =>
+                  value.value < 0 || value.value === undefined
+                    ? "The delay value must be greater than or equal to 0."
+                    : undefined,
+              }}
+            >
+              {({ state, handleChange, handleBlur }) => (
+                <Input
+                  isDisabled={!onEdit}
+                  type="number"
+                  label="Delayed Time (minutes)"
+                  id="delayInput"
+                  placeholder="Delay"
+                  className="w-full"
+                  size="lg"
+                  defaultValue={selectedTrip.trip.delay.toString()}
+                  onChange={(e) =>
+                    handleChange(Number.parseInt(e.target.value))
+                  }
+                  onBlur={handleBlur}
+                  variant="underlined"
+                  isInvalid={state.meta.errors.length > 0}
+                  errorMessage={state.meta.errors}
+                />
+              )}
+            </Field>
+            <Field name="status">
+              {({ handleBlur }) => (
+                <Input
+                  isDisabled
+                  type="text"
+                  label="Status"
+                  id="statusInput"
+                  placeholder="Status"
+                  className="w-full"
+                  size="lg"
+                  defaultValue={selectedTrip.trip.status}
+                  onBlur={handleBlur}
+                  variant="underlined"
+                />
+              )}
+            </Field>
+          </div>
         </div>
         <div className="flex flex-col mt-8">
           <p className="font-medium text-2xl my-4">Bus Information</p>

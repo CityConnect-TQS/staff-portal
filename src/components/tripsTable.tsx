@@ -79,7 +79,6 @@ export function TripsTable() {
   const [cookies] = useCookies(["user"]);
   const user = cookies.user as User;
 
-  console.log(user.token);
   const [filterValue, setFilterValue] = useState("");
   const [selectedKeys, setSelectedKeys] = useState<Selection>(new Set([]));
   const [visibleColumns, setVisibleColumns] = useState<Selection>(

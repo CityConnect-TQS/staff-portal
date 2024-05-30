@@ -12,15 +12,18 @@ export interface Trip {
   price: number;
   freeSeats: number;
   status: string;
+  delay: number;
 }
 
-export type TripCreate = Omit<Trip, "id" | "bus" | "departure" | "arrival" | "departureTime" | "arrivalTime" | "price" | "freeSeats"> & {
+export type TripCreate = Omit<Trip, "id" | "bus" | "departure" | "arrival" | "departureTime" | "arrivalTime" | "price" | "freeSeats" | "delay"> & {
   bus: BusReference;
   departure: CityReference;
   arrival: CityReference;
   departureTime: Date | string;
   arrivalTime: Date | string;
   price: number;
+  delay: number;
+  status: string;
 };
 
 export type TripReference = Pick<Trip, "id">;
