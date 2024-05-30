@@ -15,9 +15,18 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { SelectedTripCookies, Trip, TripCreate } from "@/types/trip";
 import { useState } from "react";
 import { useCookies } from "react-cookie";
-import { updateTrip } from "@/services/tripService";
+import { getTripReservations, updateTrip } from "@/services/tripService";
 import { MaterialSymbol } from "react-material-symbols";
 import { User } from "@/types/user.ts";
+import { Reservation } from "@/types/reservation";
+import {
+  Table,
+  TableHeader,
+  TableColumn,
+  TableBody,
+  TableRow,
+  TableCell,
+} from "@nextui-org/react";
 
 export function TripDetailsBoard() {
   const [cookies, setCookies] = useCookies(["user", "selectedTrip"]);
@@ -161,7 +170,23 @@ export function TripDetailsBoard() {
     },
   });
 
-  if (isLoadingCities || isLoadingBuses) {
+  const { data: reservations, isLoading: isLoadingReservations } = useQuery<
+    Reservation[],
+    Error
+  >({
+    queryKey: ["reservations", selectedTrip.trip.id, user.token],
+    queryFn: async () =>
+      await getTripReservations(selectedTrip.trip.id, user.token).then((data) =>
+        data.map((reservation) => ({
+          id: reservation.id,
+          trip: reservation.trip,
+          user: reservation.user,
+          seats: reservation.seats,
+        }))
+      ),
+  });
+
+  if (isLoadingCities || isLoadingBuses || isLoadingReservations) {
     return <div>Loading...</div>;
   }
 
@@ -449,8 +474,26 @@ export function TripDetailsBoard() {
           </div>
         </div>
       </form>
-      <div className="flex mt-8">
+      <div className="flex flex-col mt-8">
         <p className="font-medium text-2xl my-4">Reservations</p>
+        {reservations?.length === 0 ? (
+          <p className="text-lg">No reservations found.</p>
+        ) : (
+          <Table aria-label="Example static collection table">
+            <TableHeader>
+              <TableColumn>CLIENT</TableColumn>
+              <TableColumn>SEATS</TableColumn>
+            </TableHeader>
+            <TableBody>
+              {reservations?.map((reservation) => (
+                <TableRow key={reservation.id}>
+                  <TableCell>{reservation.user.name}</TableCell>
+                  <TableCell>{reservation.seats}</TableCell>
+                </TableRow>
+              )) ?? []}
+            </TableBody>
+          </Table>
+        )}
       </div>
     </div>
   );
