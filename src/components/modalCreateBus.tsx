@@ -38,7 +38,6 @@ export function ModalCreateBus({
       capacity: edit ? bus?.capacity ?? 0 : 0,
     },
     onSubmit: async ({ value }) => {
-      console.log("value", value);
 
       const busNew: BusCreate = {
         company: value.company,
