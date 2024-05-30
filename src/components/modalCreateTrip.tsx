@@ -60,6 +60,7 @@ export function ModalCreateTrip() {
       price: 0.0,
       bus: { id: 0 },
       status: "ONTIME",
+      delay: 0,
     },
     onSubmit: async ({ value }) => {
       const departureCity = cities?.find(
@@ -99,6 +100,7 @@ export function ModalCreateTrip() {
         price: value.price,
         bus: bus,
         status: "ONTIME",
+        delay: 0,
       };
 
       const tripCreated = await createTrip(trip, user.token).catch((error) => {
@@ -435,7 +437,9 @@ export function ModalCreateTrip() {
                     )}
                   </Field>
                   {state.errors && (
-                    <span className="text-red-500" id="spanError">{state.errors}</span>
+                    <span className="text-red-500" id="spanError">
+                      {state.errors}
+                    </span>
                   )}
                 </form>
               </ModalBody>
