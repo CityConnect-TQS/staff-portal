@@ -186,8 +186,6 @@ export function TripDetailsBoard() {
       ),
   });
 
-  console.log(reservations);
-
   if (isLoadingCities || isLoadingBuses || isLoadingReservations) {
     return <div>Loading...</div>;
   }
